@@ -1,3 +1,5 @@
+#![deny(missing_docs)]
+
 
 use std::collections::{HashMap, hash_map::{Keys, Values}};
 use std::hash::Hash;
@@ -66,10 +68,10 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.get(10));
+    /// println!("{}", map.get(&10));
     /// ```
     #[must_use]
-    pub fn get(&mut self, key: K) -> &V
+    pub fn get(&mut self, key: &K) -> &V
     where
         K: Sized + Eq + Hash + Clone
     {
@@ -77,7 +79,7 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
         let mut rv: Option<&V> = Option::None;
         let mut check: bool = false;
         for _key in self._inner.keys() {
-            if &key == _key {
+            if key == _key {
                 check = true;
             }
         }
@@ -89,6 +91,46 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
             false => {
                 self.insert(key.clone(), V::default());
                 rv = self._inner.get(&key);
+            },
+        };
+
+        rv.unwrap()
+    }
+
+
+    /// 
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    /// let number = map.get_mut(&10);
+    ///
+    /// *number = 100;
+    ///
+    /// println!("{}", map.get(&10));
+    /// ```
+    #[must_use]
+    pub fn get_mut(&mut self, key: &K) -> &mut V
+    where
+        K: Sized + Hash + Eq + Clone
+    {
+        #[allow(unused_assignments)]
+        let mut rv: Option<&mut V> = Option::None;
+        let mut check: bool = false;
+        for _key in self._inner.keys() {
+            if key == _key {
+                check = true;
+            }
+        }
+
+        match check {
+            true => {
+                rv = self._inner.get_mut(&key);
+            },
+            false => {
+                self.insert(key.clone(), V::default());
+                rv = self._inner.get_mut(&key);
             },
         };
 
@@ -141,7 +183,7 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
         self._inner.keys()
     }
 
-    
+
     /// Returns an iterator visiting all values in arbitrary order. The iterator element type is
     /// &'a V.
     ///
@@ -161,7 +203,7 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
     pub fn values(&self) -> Values<'_, K, V> {
         self._inner.values()
     }
-    
+
 
     /// Returns the length of the keys in the map.
     ///
@@ -203,4 +245,3 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
     }
 
 }
-

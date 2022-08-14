@@ -15,14 +15,14 @@ mod tests {
     #[test]
     fn default_value_i8() {
         let mut map = DefaultHashMap::<i8, i8>::new();
-        assert_eq!(map.get(1), &0);
+        assert_eq!(map.get(&1), &0);
     }
 
     #[test]
     fn non_default_value_i8() {
         let mut map = DefaultHashMap::<i8, i8>::new();
         map.insert(1,2);
-        assert_eq!(map.get(1), &2);
+        assert_eq!(map.get(&1), &2);
     }
 
     #[test]
@@ -30,7 +30,7 @@ mod tests {
         let mut map = DefaultHashMap::<i8, i8>::new();
         map.insert(1,123);
         let _ = map.remove(&1);
-        assert_eq!(map.get(1), &0);
+        assert_eq!(map.get(&1), &0);
     }
 
     #[test]
@@ -82,4 +82,16 @@ mod tests {
         assert_eq!(map.contains_key(&1), true);
         assert_eq!(map.contains_key(&2), false);
     }
+
+    #[test]
+    fn get_mut() {
+        let mut map = DefaultHashMap::<i8, Vec<i8>>::new();
+        
+        let v1 = map.get_mut(&1);
+
+        v1.push(10);
+
+        assert_eq!(map.get(&1), &vec!(10));
+    }
+
 }
