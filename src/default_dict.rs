@@ -8,6 +8,7 @@ use std::hash::Hash;
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
+#[derive(Debug, PartialEq)]
 pub struct DefaultHashMap<K, V>
 where
     K: Eq + Hash,
@@ -245,3 +246,48 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
     }
 
 }
+
+
+#[macro_export]
+/// A quick way to instantiate a hashmap.
+///
+/// A trailing comma is allowed but not required here
+///
+/// # Example
+/// ```
+/// use defaultdict::DefaultHashMap;
+///
+///
+/// let default_map: DefaultHashMap<i8, i8> = defaultdict::defaulthashmap!(1,2,3,);
+///
+/// let custom_map: DefaultHashMap<i8, i8> = defaultdict::defaulthashmap!(
+///     (1, 1),
+///     (2, 2),
+/// );
+/// ```
+macro_rules! defaulthashmap {
+
+    // match 1
+    ( $( ($key:expr, $val:expr) ),* $(,)? ) => {
+        {
+            let mut map = DefaultHashMap::new();
+            $(
+                let _ = map.insert($key, $val);
+            )*
+            map
+        }
+    };
+
+    // match 2
+    ( $( $key:expr ),* $(,)? ) => {
+        {
+            let mut map = DefaultHashMap::new();
+            $(
+                let _ = map.get(&$key);
+            )*
+            map
+        }
+    };
+
+}
+

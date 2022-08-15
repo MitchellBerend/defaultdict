@@ -94,4 +94,54 @@ mod tests {
         assert_eq!(map.get(&1), &vec!(10));
     }
 
+    #[test]
+    fn macro_test() {
+        let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+
+        let map1: DefaultHashMap<i8, i8> = defaulthashmap!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
+        for i in 1..4 {
+            let _ = _map.get(&i);
+        }
+
+        let mut _map1: DefaultHashMap<i8, i8> = DefaultHashMap::new();
+        for i in 1..5 {
+            let _ = _map1.insert(i, i);
+        }
+
+        assert_eq!(map, _map);
+        assert_eq!(map1, _map1);
+    }
+
+    #[test]
+    fn macro_test_slight_change() {
+        let map: DefaultHashMap<i8, i8> = defaulthashmap!(1, 2, 3);
+
+        let map1: DefaultHashMap<i8, i8> = defaulthashmap!(
+            (1,1),
+            (2,2),
+            (3,3),
+            (4,4)
+        );
+
+        let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
+        for i in 1..4 {
+            let _ = _map.get(&i);
+        }
+
+        let mut _map1: DefaultHashMap<i8, i8> = DefaultHashMap::new();
+        for i in 1..5 {
+            let _ = _map1.insert(i, i);
+        }
+
+        assert_eq!(map, _map);
+        assert_eq!(map1, _map1);
+    }
 }
+
