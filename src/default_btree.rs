@@ -5,19 +5,23 @@ use std::hash::Hash;
 
 
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
-/// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
+/// that apply on the key and value that are inherited from the [`BTreeMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
-#[derive(Debug, PartialEq, PartialOrd)]
+#[derive(Debug, PartialEq)]
 pub struct DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash,
+    K: Eq + Hash + Ord,
     V: Default,
 {
     _inner: BTreeMap<K, V>,
 }
 
 
-impl<K: Eq + Hash + Ord, V: Default> DefaultBTreeMap<K, V> {
+impl<K, V> DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord,
+    V: Default,
+{
     /// Creates an empty [`DefaultBTreeMap`].
     ///
     /// # Example
@@ -55,8 +59,8 @@ impl<K: Eq + Hash + Ord, V: Default> DefaultBTreeMap<K, V> {
 
 
     /// Returns a reference to the value of the key passed in.
-    /// Because this hashmap mimicks the python defaultdict, it will also return a reference to a
-    /// value if the key is not present. This reference will then be stored in the hashmap and be
+    /// Because this btreemap mimicks the python defaultdict, it will also return a reference to a
+    /// value if the key is not present. This reference will then be stored in the btreemap and be
     /// the default value.
     ///
     /// The key type must implement Hash and Eq.
@@ -224,7 +228,7 @@ impl<K: Eq + Hash + Ord, V: Default> DefaultBTreeMap<K, V> {
     }
 
 
-    /// Returns true if the key passed in exists in the HashMap.
+    /// Returns true if the key passed in exists in the BTreeMap.
     ///
     /// # Example
     /// ```
@@ -247,7 +251,7 @@ impl<K: Eq + Hash + Ord, V: Default> DefaultBTreeMap<K, V> {
 
 
 #[macro_export]
-/// A quick way to instantiate a hashmap.
+/// A quick way to instantiate a BTreeMap.
 ///
 /// A trailing comma is allowed but not required here
 ///

@@ -18,7 +18,11 @@ where
 }
 
 
-impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
+impl<K, V> DefaultHashMap<K, V>
+where
+    K: Eq + Hash,
+    V: Default,
+{
     /// Creates an empty [`DefaultHashMap`].
     ///
     /// # Example
@@ -249,7 +253,7 @@ impl<K: Eq + Hash, V: Default> DefaultHashMap<K, V> {
 
 
 #[macro_export]
-/// A quick way to instantiate a hashmap.
+/// A quick way to instantiate a HashMap.
 ///
 /// A trailing comma is allowed but not required here
 ///
