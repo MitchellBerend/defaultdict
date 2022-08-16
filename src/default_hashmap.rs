@@ -2,13 +2,14 @@
 
 
 use std::collections::{HashMap, hash_map::{Keys, Values}};
+use std::default::Default;
 use std::hash::Hash;
 
 
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct DefaultHashMap<K, V>
 where
     K: Eq + Hash,
@@ -91,11 +92,11 @@ where
 
         match check {
             true => {
-                rv = self._inner.get(&key);
+                rv = self._inner.get(key);
             },
             false => {
                 self.insert(key.clone(), V::default());
-                rv = self._inner.get(&key);
+                rv = self._inner.get(key);
             },
         };
 
@@ -131,11 +132,11 @@ where
 
         match check {
             true => {
-                rv = self._inner.get_mut(&key);
+                rv = self._inner.get_mut(key);
             },
             false => {
                 self.insert(key.clone(), V::default());
-                rv = self._inner.get_mut(&key);
+                rv = self._inner.get_mut(key);
             },
         };
 
@@ -169,7 +170,8 @@ where
     }
 
 
-    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is &'a K.
+    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is 
+    /// &'a K.
     ///
     /// # Example
     /// ```
@@ -229,6 +231,20 @@ where
         self._inner.len()
     }
 
+    /// Returns true if the map does not contain any keys.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// println!("{}", map.is_empty());
+    /// ```
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self._inner.is_empty()
+    }
 
     /// Returns true if the key passed in exists in the HashMap.
     ///
@@ -249,6 +265,17 @@ where
         self._inner.contains_key(key)
     }
 
+}
+
+
+impl<K, V> Default for DefaultHashMap<K, V>
+where
+    K: Eq + Hash,
+    V: Default,
+{
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 
@@ -294,4 +321,3 @@ macro_rules! defaulthashmap {
     };
 
 }
-

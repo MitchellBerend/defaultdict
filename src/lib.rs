@@ -3,8 +3,10 @@
 //!
 //! This behaviour does require that the type of the value does have the [`Default`] implemented.
 
+
 mod default_btree;
 mod default_hashmap;
+
 pub use default_hashmap::DefaultHashMap;
 pub use default_btree::DefaultBTreeMap;
 
@@ -17,6 +19,15 @@ mod tests {
     fn default_value_i8_hashmap() {
         let mut map = DefaultHashMap::<i8, i8>::new();
         assert_eq!(map.get(&1), &0);
+    }
+
+    #[test]
+    fn default_new_hashmap() {
+        let map1: DefaultHashMap<i8, i8> = DefaultHashMap::new();
+
+        let map2: DefaultHashMap<i8, i8> = DefaultHashMap::default();
+
+        assert_eq!(map1, map2);
     }
 
     #[test]
@@ -96,6 +107,19 @@ mod tests {
     }
 
     #[test]
+    fn is_empty_hashmap() {
+        let mut map = DefaultHashMap::<i8, Vec<i8>>::new();
+
+        let _ = map.get_mut(&1);
+
+        let map1 = DefaultHashMap::<i8, Vec<i8>>::new();
+
+        assert_eq!(map.is_empty(), false);
+        assert_eq!(map1.is_empty(), true);
+
+    }
+
+    #[test]
     fn macro_test_hashmap() {
         let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
 
@@ -145,11 +169,6 @@ mod tests {
         assert_eq!(map1, _map1);
     }
 
-    #[test]
-    fn new_btree() {
-
-
-    }
 
     // Start btree tests
 
@@ -159,6 +178,14 @@ mod tests {
         assert_eq!(map.get(&1), &0);
     }
 
+    #[test]
+    fn default_new_btree() {
+        let map1: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
+
+        let map2: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::default();
+
+        assert_eq!(map1, map2);
+    }
     #[test]
     fn non_default_value_i8_btree() {
         let mut map = DefaultBTreeMap::<i8, i8>::new();
@@ -236,6 +263,19 @@ mod tests {
     }
 
     #[test]
+    fn is_empty_btree() {
+        let mut map = DefaultBTreeMap::<i8, Vec<i8>>::new();
+
+        let _ = map.get_mut(&1);
+
+        let map1 = DefaultBTreeMap::<i8, Vec<i8>>::new();
+
+        assert_eq!(map.is_empty(), false);
+        assert_eq!(map1.is_empty(), true);
+
+    }
+
+    #[test]
     fn macro_test_btree() {
         let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
 
@@ -284,6 +324,4 @@ mod tests {
         assert_eq!(map, _map);
         assert_eq!(map1, _map1);
     }
-
 }
-
