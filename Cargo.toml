@@ -1,10 +1,13 @@
 [package]
 name = "defaultdict"
-version = "0.5.0"
+version = "0.6.0"
 description = "A hashmap implementation that mirrors the python defaultdict."
 edition = "2021"
 authors = ["Mitchell Berendhuysen"]
 license = "MIT"
+
+documentation = "https://docs.rs/defaultdict"
+
 
 repository = "https://github.com/MitchellBerend/defaultdict"
 
