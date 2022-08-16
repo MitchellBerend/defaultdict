@@ -79,7 +79,7 @@ where
     #[must_use]
     pub fn get(&mut self, key: &K) -> &V
     where
-        K: Sized + Eq + Hash + Clone
+        K: Eq + Hash + Clone
     {
         #[allow(unused_assignments)]
         let mut rv: Option<&V> = Option::None;
@@ -119,7 +119,7 @@ where
     #[must_use]
     pub fn get_mut(&mut self, key: &K) -> &mut V
     where
-        K: Sized + Hash + Eq + Clone
+        K: Hash + Eq + Clone
     {
         #[allow(unused_assignments)]
         let mut rv: Option<&mut V> = Option::None;
