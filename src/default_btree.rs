@@ -280,6 +280,56 @@ where
 }
 
 
+impl<K, V> IntoIterator for DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    type Item = (K, V);
+    type IntoIter = DefaultBTreeMapIter<K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let mut keys: Vec<K> = vec!();
+        for k in self.keys() {
+            keys.push(k.to_owned());
+        }
+
+        DefaultBTreeMapIter {
+            _defaultbtree: self,
+            keys,
+        }
+    }
+}
+
+
+impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    type Item = (K, V);
+    fn next(&mut self) -> Option<Self::Item> {
+        match self.keys.pop() {
+            Some(key) => {
+                let val = self._defaultbtree.remove(&key);
+                Option::Some((key, val))
+            },
+            None => Option::None,
+        }
+    }
+}
+
+
+pub struct DefaultBTreeMapIter<K, V>
+where
+    K: Eq + Hash + Ord,
+    V: Default,
+{
+    _defaultbtree: DefaultBTreeMap<K, V>,
+    keys: Vec<K>
+}
+
+
 #[macro_export]
 /// A quick way to instantiate a BTreeMap.
 ///

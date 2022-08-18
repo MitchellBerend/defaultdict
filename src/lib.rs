@@ -15,6 +15,7 @@ pub use default_btree::DefaultBTreeMap;
 mod tests {
     use super::*;
 
+
     #[test]
     fn default_value_i8_hashmap() {
         let mut map = DefaultHashMap::<i8, i8>::new();
@@ -117,6 +118,25 @@ mod tests {
         assert_eq!(map.is_empty(), false);
         assert_eq!(map1.is_empty(), true);
 
+    }
+
+    #[test]
+    fn into_iter_default_hashmap() {
+        let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
+
+        for i in 0..10 {
+            let _  = map.get(&i);
+        }
+
+        let mut v: Vec<(i8, u8)> = map.into_iter().collect();
+        let mut correct_v: Vec<(i8, u8)> = vec!();
+        v.sort();
+
+        for i in 0..10 {
+            correct_v.push((i as i8, 0 as u8));
+        }
+
+        assert_eq!(v, correct_v);
     }
 
     #[test]
@@ -273,6 +293,25 @@ mod tests {
         assert_eq!(map.is_empty(), false);
         assert_eq!(map1.is_empty(), true);
 
+    }
+
+    #[test]
+    fn into_iter_default_btree() {
+        let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
+
+        for i in 0..10 {
+            let _  = map.get(&i);
+        }
+
+        let mut v: Vec<(i8, u8)> = map.into_iter().collect();
+        let mut correct_v: Vec<(i8, u8)> = vec!();
+        v.sort();
+
+        for i in 0..10 {
+            correct_v.push((i as i8, 0 as u8));
+        }
+
+        assert_eq!(v, correct_v);
     }
 
     #[test]
