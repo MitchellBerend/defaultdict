@@ -291,7 +291,7 @@ where
     fn into_iter(self) -> Self::IntoIter {
         let mut keys: Vec<K> = vec!();
         for k in self.keys() {
-            keys.push(k.to_owned());
+            keys.insert(0, k.to_owned());
         }
 
         DefaultBTreeMapIter {

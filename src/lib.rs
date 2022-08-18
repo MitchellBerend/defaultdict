@@ -121,6 +121,29 @@ mod tests {
     }
 
     #[test]
+    fn into_iter_no_default_hashmap() {
+        let map: DefaultHashMap<i8, u8> = defaulthashmap!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        let mut v: Vec<(i8, u8)> = map.into_iter().collect();
+        v.sort();
+
+        let correct_v: Vec<(i8, u8)> = vec!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        assert_eq!(v, correct_v);
+    }
+
+
+    #[test]
     fn into_iter_default_hashmap() {
         let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 
@@ -293,6 +316,27 @@ mod tests {
         assert_eq!(map.is_empty(), false);
         assert_eq!(map1.is_empty(), true);
 
+    }
+
+    #[test]
+    fn into_iter_no_default_btreemap() {
+        let map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        let v: Vec<(i8, u8)> = map.into_iter().collect();
+
+        let correct_v: Vec<(i8, u8)> = vec!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        assert_eq!(v, correct_v);
     }
 
     #[test]
