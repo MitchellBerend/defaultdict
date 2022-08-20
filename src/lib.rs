@@ -1,4 +1,4 @@
-//! This library exposes a struct that mimicks the behaviour of the python 
+//! This library exposes a struct that mimicks the behaviour of the python
 //! [defaultdict](https://docs.python.org/3/library/collections.html#collections.defaultdict).
 //!
 //! This behaviour does require that the type of the value does have the [`Default`] implemented.
@@ -163,6 +163,36 @@ mod tests {
     }
 
     #[test]
+    fn borrow_loop_over_default_hashmap() {
+        let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
+
+        for i in 0..10 {
+            let _  = map.get(&i);
+        }
+
+        let mut v: Vec<(&i8, &u8)> = vec!();
+        let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+            (&0, &0),
+            (&1, &0),
+            (&2, &0),
+            (&3, &0),
+            (&4, &0),
+            (&5, &0),
+            (&6, &0),
+            (&7, &0),
+            (&8, &0),
+            (&9, &0),
+        );
+
+        for (key, value) in &map {
+            v.push((key, value));
+        }
+        v.sort();
+
+        assert_eq!(correct_v, v);
+    }
+
+    #[test]
     fn macro_test_hashmap() {
         let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
 
@@ -213,7 +243,8 @@ mod tests {
     }
 
 
-    // Start btree tests
+
+    // start btree tests
 
     #[test]
     fn default_value_i8_btree() {
@@ -356,6 +387,35 @@ mod tests {
         }
 
         assert_eq!(v, correct_v);
+    }
+
+    #[test]
+    fn borrow_loop_over_default_btree() {
+        let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
+
+        for i in 0..10 {
+            let _  = map.get(&i);
+        }
+
+        let mut v: Vec<(&i8, &u8)> = vec!();
+        let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+            (&0, &0),
+            (&1, &0),
+            (&2, &0),
+            (&3, &0),
+            (&4, &0),
+            (&5, &0),
+            (&6, &0),
+            (&7, &0),
+            (&8, &0),
+            (&9, &0),
+        );
+
+        for (key, value) in &map {
+            v.push((key, value));
+        }
+
+        assert_eq!(correct_v, v);
     }
 
     #[test]

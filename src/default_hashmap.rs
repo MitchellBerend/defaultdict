@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 
 
-use std::collections::{HashMap, hash_map::{Keys, Values}};
+use std::collections::{HashMap, hash_map::{Keys, Values, Iter}};
 use std::default::Default;
 use std::hash::Hash;
 
@@ -104,7 +104,10 @@ where
     }
 
 
-    /// 
+    /// Returns a mutable reference to the value corresponding to the key.
+    /// If the key is not present in the hashmap it will return the default value and insert it in
+    /// the map.
+    ///
     /// # Example
     /// ```
     /// use defaultdict::DefaultHashMap;
@@ -301,12 +304,41 @@ where
 }
 
 
+impl<'a, K, V> IntoIterator for &'a DefaultHashMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    type Item = (&'a K,&'a V);
+    type IntoIter = Iter<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self._inner.iter()
+    }
+}
+
+
+// impl<'a, K, V> IntoIterator for &'a mut DefaultHashMap<K, V>
+// where
+//     K: Eq + Hash + Ord + Clone,
+//     V: Default,
+// {
+//     type Item = (&'a K,&'a V);
+//     type IntoIter = IterMut<'a, K, V>;
+//
+//     fn into_iter(self) -> Self::IntoIter {
+//         self._inner.iter_mut()
+//     }
+// }
+
+
 impl<K, V> Iterator for DefaultHashMapIter<K, V>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
     type Item = (K, V);
+
     fn next(&mut self) -> Option<Self::Item> {
         match self.keys.pop() {
             Some(key) => {
