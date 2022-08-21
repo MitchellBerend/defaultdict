@@ -41,23 +41,23 @@ where
     }
 
 
-    /// Inserts a key value pair into the map.
-    ///
-    /// If the map had the key already present it will be overwritten.
+    /// Returns true if the key passed in exists in the HashMap.
     ///
     /// # Example
     /// ```
     /// use defaultdict::DefaultHashMap;
     ///
     /// let mut map = DefaultHashMap::<i8, i8>::new();
-    /// map.insert(10, 20)
+    /// map.insert(10, 20);
+    ///
+    /// println!("{}", map.contains_key(&10));
     /// ```
     #[inline]
-    pub fn insert(&mut self, key: K, value: V)
+    pub fn contains_key(&self, key: &K) -> bool
     where
         K: Eq + Hash
     {
-        let _ = &self._inner.insert(key, value);
+        self._inner.contains_key(key)
     }
 
 
@@ -148,6 +148,83 @@ where
     }
 
 
+    /// Inserts a key value pair into the map.
+    ///
+    /// If the map had the key already present it will be overwritten.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    /// map.insert(10, 20)
+    /// ```
+    #[inline]
+    pub fn insert(&mut self, key: K, value: V)
+    where
+        K: Eq + Hash
+    {
+        let _ = &self._inner.insert(key, value);
+    }
+
+
+    /// Returns true if the map does not contain any keys.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// println!("{}", map.is_empty());
+    /// ```
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self._inner.is_empty()
+    }
+
+
+    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is 
+    /// &'a K.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    /// map.insert(10, 20);
+    /// map.insert(11, 21);
+    /// map.insert(12, 22);
+    /// map.insert(13, 23);
+    ///
+    /// println!("{:?}", map.keys());
+    /// ```
+    #[inline]
+    pub fn keys(&self) -> Keys<'_, K, V> {
+        self._inner.keys()
+    }
+
+
+    /// Returns the length of the keys in the map.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    /// map.insert(10, 20);
+    /// map.insert(11, 21);
+    /// map.insert(12, 22);
+    /// map.insert(13, 23);
+    ///
+    /// println!("{}", map.len());
+    /// ```
+    #[inline]
+    pub fn len(&self) -> usize {
+        self._inner.len()
+    }
+
+
     /// Removes a key from the map, returning the value at the key if the key was previously in the
     /// map. If the key is not present in the map it will return the default value.
     ///
@@ -174,24 +251,38 @@ where
     }
 
 
-    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is 
-    /// &'a K.
+    /// Retains only the elements specified by the predicate.
+    /// In other words, remove all pairs (k, v) for which f(&k, &mut v) returns false. The elements
+    /// are visited in unsorted (and unspecified) order.
     ///
     /// # Example
     /// ```
-    /// use defaultdict::DefaultHashMap;
+    /// use defaultdict::{DefaultHashMap, defaulthashmap};
     ///
-    /// let mut map = DefaultHashMap::<i8, i8>::new();
-    /// map.insert(10, 20);
-    /// map.insert(11, 21);
-    /// map.insert(12, 22);
-    /// map.insert(13, 23);
+    /// let mut map = defaulthashmap!(
+    ///     (0, 0),
+    ///     (1, 0),
+    ///     (2, 0),
+    ///     (3, 0),
+    ///     (4, 0),
+    ///     (5, 0),
+    ///     (6, 0),
+    ///     (7, 0),
+    ///     (8, 0),
+    ///     (9, 0),
+    /// );
     ///
-    /// println!("{:?}", map.keys());
+    /// map.retain(|key, value| {
+    ///     key <= &2
+    /// });
+    ///
+    /// println!("{:?}", map);
     /// ```
-    #[inline]
-    pub fn keys(&self) -> Keys<'_, K, V> {
-        self._inner.keys()
+    pub fn retain<F>(&mut self, func: F)
+    where
+        F: FnMut(&K, &mut V) -> bool,
+    {
+        self._inner.retain(func);
     }
 
 
@@ -213,60 +304,6 @@ where
     #[inline]
     pub fn values(&self) -> Values<'_, K, V> {
         self._inner.values()
-    }
-
-
-    /// Returns the length of the keys in the map.
-    ///
-    /// # Example
-    /// ```
-    /// use defaultdict::DefaultHashMap;
-    ///
-    /// let mut map = DefaultHashMap::<i8, i8>::new();
-    /// map.insert(10, 20);
-    /// map.insert(11, 21);
-    /// map.insert(12, 22);
-    /// map.insert(13, 23);
-    ///
-    /// println!("{}", map.len());
-    /// ```
-    #[inline]
-    pub fn len(&self) -> usize {
-        self._inner.len()
-    }
-
-    /// Returns true if the map does not contain any keys.
-    ///
-    /// # Example
-    /// ```
-    /// use defaultdict::DefaultHashMap;
-    ///
-    /// let mut map = DefaultHashMap::<i8, i8>::new();
-    ///
-    /// println!("{}", map.is_empty());
-    /// ```
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self._inner.is_empty()
-    }
-
-    /// Returns true if the key passed in exists in the HashMap.
-    ///
-    /// # Example
-    /// ```
-    /// use defaultdict::DefaultHashMap;
-    ///
-    /// let mut map = DefaultHashMap::<i8, i8>::new();
-    /// map.insert(10, 20);
-    ///
-    /// println!("{}", map.contains_key(&10));
-    /// ```
-    #[inline]
-    pub fn contains_key(&self, key: &K) -> bool
-    where
-        K: Eq + Hash
-    {
-        self._inner.contains_key(key)
     }
 
 }

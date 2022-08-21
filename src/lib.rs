@@ -108,6 +108,27 @@ mod tests {
     }
 
     #[test]
+    fn retain_hashmap() {
+        let mut map: DefaultHashMap<i8, u8> = defaulthashmap!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        map.retain(|key, _| {
+            key <= &2
+        });
+
+        let correct_map: DefaultHashMap<i8, u8> = defaulthashmap!(
+            (1, 1),
+            (2, 2),
+        );
+
+        assert_eq!(correct_map, map);
+    }
+
+    #[test]
     fn is_empty_hashmap() {
         let mut map = DefaultHashMap::<i8, Vec<i8>>::new();
 
@@ -390,6 +411,27 @@ mod tests {
         v1.push(10);
 
         assert_eq!(map.get(&1), &vec!(10));
+    }
+
+    #[test]
+    fn retain_btree() {
+        let mut map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+        );
+
+        map.retain(|key, _| {
+            key <= &2
+        });
+
+        let correct_map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
+            (1, 1),
+            (2, 2),
+        );
+
+        assert_eq!(correct_map, map);
     }
 
     #[test]
