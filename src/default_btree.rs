@@ -1,8 +1,9 @@
 #![deny(missing_docs)]
 
-use std::collections::{BTreeMap, btree_map::{Keys, Values, Iter}};
+use std::collections::{BTreeMap, btree_map::{Keys, Values, Iter, IterMut}};
 use std::default::Default;
 use std::hash::Hash;
+use std::ops::Index;
 
 
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
@@ -103,10 +104,6 @@ where
     }
 
 
-    /// Returns a mutable reference to the value corresponding to the key.
-    /// If the key is not present in the btree it will return the default value and insert it in
-    /// the map.
-    ///
     /// # Example
     /// ```
     /// use defaultdict::DefaultBTreeMap;
@@ -320,18 +317,36 @@ where
 }
 
 
-// impl<'a, K, V> IntoIterator for &'a mut DefaultBTreeMap<K, V>
-// where
-//     K: Eq + Hash + Ord + Clone,
-//     V: Default,
-// {
-//     type Item = (&'a K,&'a V);
-//     type IntoIter = IterMut<'a, K, V>;
-//
-//     fn into_iter(self) -> Self::IntoIter {
-//         self._inner.iter()
-//     }
-// }
+impl<K, V> Index<&K> for DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    type Output = V;
+
+    fn index(&self, key: &K) -> &V {
+        match self._inner.get(key) {
+            Some(v) => v,
+            None => {
+                panic!("no entry found for key")
+            }
+        }
+    }
+}
+
+
+impl<'a, K, V> IntoIterator for &'a mut DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    type Item = (&'a K, &'a mut V);
+    type IntoIter = IterMut<'a, K, V>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self._inner.iter_mut()
+    }
+}
 
 
 impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
@@ -340,7 +355,6 @@ where
     V: Default,
 {
     type Item = (K, V);
-
     fn next(&mut self) -> Option<Self::Item> {
         match self.keys.pop() {
             Some(key) => {

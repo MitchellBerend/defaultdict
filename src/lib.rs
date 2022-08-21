@@ -193,6 +193,62 @@ mod tests {
     }
 
     #[test]
+    fn borrow_loop_over_mut_default_hashmap() {
+        let mut map: DefaultHashMap<i8, u8> = defaulthashmap!(
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (3, 0),
+            (4, 0),
+            (5, 0),
+            (6, 0),
+            (7, 0),
+            (8, 0),
+            (9, 0),
+        );
+
+        let mut v: Vec<(&i8, &u8)> = vec!();
+        let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+            (&0, &1),
+            (&1, &1),
+            (&2, &1),
+            (&3, &1),
+            (&4, &1),
+            (&5, &1),
+            (&6, &1),
+            (&7, &1),
+            (&8, &1),
+            (&9, &1),
+        );
+
+        for (key, value) in &mut map {
+            *value += 1;
+            v.push((key, value));
+        }
+        v.sort();
+
+        assert_eq!(correct_v, v);
+    }
+
+
+    #[test]
+    fn index_hashmap() {
+        let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+        let val = map[&1];
+
+        assert_eq!(0, val);
+    }
+
+    #[test]
+    #[should_panic]
+    fn index_hashmap_panic() {
+        let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+
+        // this should panic since there is no 0 key
+        let _ = map[&0];
+    }
+
+    #[test]
     fn macro_test_hashmap() {
         let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
 
@@ -416,6 +472,61 @@ mod tests {
         }
 
         assert_eq!(correct_v, v);
+    }
+
+    #[test]
+    fn borrow_loop_over_mut_default_btree() {
+        let mut map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
+            (0, 0),
+            (1, 0),
+            (2, 0),
+            (3, 0),
+            (4, 0),
+            (5, 0),
+            (6, 0),
+            (7, 0),
+            (8, 0),
+            (9, 0),
+        );
+
+        let mut v: Vec<(&i8, &u8)> = vec!();
+        let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+            (&0, &1),
+            (&1, &1),
+            (&2, &1),
+            (&3, &1),
+            (&4, &1),
+            (&5, &1),
+            (&6, &1),
+            (&7, &1),
+            (&8, &1),
+            (&9, &1),
+        );
+
+        for (key, value) in &mut map {
+            *value += 1;
+            v.push((key, value));
+        }
+        v.sort();
+
+        assert_eq!(correct_v, v);
+    }
+
+    #[test]
+    fn index_btree() {
+        let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
+        let val = map[&1];
+
+        assert_eq!(0, val);
+    }
+
+    #[test]
+    #[should_panic]
+    fn index_btree_panic() {
+        let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
+
+        // this should panic since there is no 0 key
+        let _ = map[&0];
     }
 
     #[test]
