@@ -15,6 +15,7 @@ pub use default_btree::DefaultBTreeMap;
 mod tests {
     use super::*;
 
+    use std::collections::{HashMap, BTreeMap};
 
     #[test]
     fn default_value_i8_hashmap() {
@@ -267,6 +268,60 @@ mod tests {
 
         // this should panic since there is no 0 key
         let _ = map[&0];
+    }
+
+
+
+
+    #[test]
+    fn hashmap_into_defaulthashmap() {
+        let mut hashmap: HashMap<u8, i8> = HashMap::new();
+
+        for i in 0..10 {
+            hashmap.insert(i as u8, i as i8);
+        };
+
+        let map: DefaultHashMap<u8, i8> = hashmap.into();
+
+        let correct_map: DefaultHashMap<u8, i8> = defaulthashmap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+
+        assert_eq!(correct_map, map);
+    }
+
+
+    #[test]
+    fn defaulthashmap_into_hashmap() {
+        let map: DefaultHashMap<u8, i8> = defaulthashmap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+        let hashmap: HashMap<u8, i8> = map.into();
+        let mut correct_hashmap: HashMap<u8, i8> = HashMap::new();
+
+        for i in 0..10 {
+            correct_hashmap.insert(i as u8, i as i8);
+        };
+
+        assert_eq!(correct_hashmap, hashmap);
     }
 
     #[test]
@@ -569,6 +624,56 @@ mod tests {
 
         // this should panic since there is no 0 key
         let _ = map[&0];
+    }
+
+    #[test]
+    fn btree_into_defaultbtree() {
+        let mut btree: BTreeMap<u8, i8> = BTreeMap::new();
+
+        for i in 0..10 {
+            btree.insert(i as u8, i as i8);
+        };
+
+        let map: DefaultBTreeMap<u8, i8> = btree.into();
+
+        let correct_map: DefaultBTreeMap<u8, i8> = defaultbtreemap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+
+        assert_eq!(correct_map, map);
+    }
+
+    #[test]
+    fn defaultbtree_into_btree() {
+        let map: DefaultBTreeMap<u8, i8> = defaultbtreemap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+        let btree: BTreeMap<u8, i8> = map.into();
+        let mut correct_btree: BTreeMap<u8, i8> = BTreeMap::new();
+
+        for i in 0..10 {
+            correct_btree.insert(i as u8, i as i8);
+        };
+
+        assert_eq!(correct_btree, btree);
     }
 
     #[test]

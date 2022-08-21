@@ -388,6 +388,31 @@ where
 }
 
 
+impl<K, V> From<HashMap<K, V>> for DefaultHashMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    fn from(btree: HashMap<K, V>) -> Self {
+        Self {
+            _inner: btree,
+        }
+    }
+
+}
+
+
+impl<K, V> Into<HashMap<K, V>> for DefaultHashMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    fn into(self) -> HashMap<K, V> {
+        self._inner
+    }
+}
+
+
 impl<K, V> Iterator for DefaultHashMapIter<K, V>
 where
     K: Eq + Hash + Ord + Clone,

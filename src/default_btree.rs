@@ -383,6 +383,31 @@ where
 }
 
 
+impl<K, V> From<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    fn from(btree: BTreeMap<K, V>) -> Self {
+        Self {
+            _inner: btree,
+        }
+    }
+
+}
+
+
+impl<K, V> Into<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
+where
+    K: Eq + Hash + Ord + Clone,
+    V: Default,
+{
+    fn into(self) -> BTreeMap<K, V> {
+        self._inner
+    }
+}
+
+
 impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
 where
     K: Eq + Hash + Ord + Clone,
