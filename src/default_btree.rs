@@ -16,6 +16,7 @@ where
     V: Default,
 {
     _inner: BTreeMap<K, V>,
+    _default: V,
 }
 
 
@@ -35,7 +36,8 @@ where
     #[must_use]
     pub fn new() -> Self {
         Self {
-            _inner: BTreeMap::new()
+            _inner: BTreeMap::new(),
+            _default: V::default(),
         }
     }
 
@@ -62,8 +64,7 @@ where
 
     /// Returns a reference to the value of the key passed in.
     /// Because this btreemap mimicks the python defaultdict, it will also return a reference to a
-    /// value if the key is not present. This reference will then be stored in the btreemap and be
-    /// the default value.
+    /// value if the key is not present.
     ///
     /// The key type must implement Hash and Eq.
     ///
@@ -77,30 +78,14 @@ where
     /// println!("{}", map.get(&10));
     /// ```
     #[must_use]
-    pub fn get(&mut self, key: &K) -> &V
+    pub fn get(&self, key: &K) -> &V
     where
         K: Eq + Hash + Clone + Ord
     {
-        #[allow(unused_assignments)]
-        let mut rv: Option<&V> = Option::None;
-        let mut check: bool = false;
-        for _key in self._inner.keys() {
-            if key == _key {
-                check = true;
-            }
+        match self._inner.get(key) {
+            Some(val) => val,
+            None => &self._default,
         }
-
-        match check {
-            true => {
-                rv = self._inner.get(key);
-            },
-            false => {
-                self.insert(key.clone(), V::default());
-                rv = self._inner.get(key);
-            },
-        };
-
-        rv.unwrap()
     }
 
 
@@ -391,6 +376,7 @@ where
     fn from(btree: BTreeMap<K, V>) -> Self {
         Self {
             _inner: btree,
+            _default: V::default(),
         }
     }
 
@@ -471,7 +457,7 @@ macro_rules! defaultbtreemap {
         {
             let mut map = DefaultBTreeMap::new();
             $(
-                let _ = map.get(&$key);
+                let _ = map.get_mut(&$key);
             )*
             map
         }

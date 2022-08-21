@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn default_value_i8_hashmap() {
-        let mut map = DefaultHashMap::<i8, i8>::new();
+        let map = DefaultHashMap::<i8, i8>::new();
         assert_eq!(map.get(&1), &0);
     }
 
@@ -170,7 +170,7 @@ mod tests {
         let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 
         for i in 0..10 {
-            let _  = map.get(&i);
+            let _  = map.get_mut(&i);
         }
 
         let mut v: Vec<(i8, u8)> = map.into_iter().collect();
@@ -189,7 +189,7 @@ mod tests {
         let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 
         for i in 0..10 {
-            let _  = map.get(&i);
+            let _  = map.get_mut(&i);
         }
 
         let mut v: Vec<(&i8, &u8)> = vec!();
@@ -337,7 +337,7 @@ mod tests {
 
         let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
         for i in 1..4 {
-            let _ = _map.get(&i);
+            let _ = _map.get_mut(&i);
         }
 
         let mut _map1: DefaultHashMap<i8, i8> = DefaultHashMap::new();
@@ -362,7 +362,7 @@ mod tests {
 
         let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
         for i in 1..4 {
-            let _ = _map.get(&i);
+            let _ = _map.get_mut(&i);
         }
 
         let mut _map1: DefaultHashMap<i8, i8> = DefaultHashMap::new();
@@ -380,7 +380,7 @@ mod tests {
 
     #[test]
     fn default_value_i8_btree() {
-        let mut map = DefaultBTreeMap::<i8, i8>::new();
+        let map = DefaultBTreeMap::<i8, i8>::new();
         assert_eq!(map.get(&1), &0);
     }
 
@@ -528,7 +528,7 @@ mod tests {
         let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
 
         for i in 0..10 {
-            let _  = map.get(&i);
+            let _  = map.get_mut(&i);
         }
 
         let mut v: Vec<(i8, u8)> = map.into_iter().collect();
@@ -547,7 +547,7 @@ mod tests {
         let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
 
         for i in 0..10 {
-            let _  = map.get(&i);
+            let _  = map.get_mut(&i);
         }
 
         let mut v: Vec<(&i8, &u8)> = vec!();
@@ -689,7 +689,7 @@ mod tests {
 
         let mut _map: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
         for i in 1..4 {
-            let _ = _map.get(&i);
+            let _ = _map.get_mut(&i);
         }
 
         let mut _map1: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
@@ -714,7 +714,7 @@ mod tests {
 
         let mut _map: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
         for i in 1..4 {
-            let _ = _map.get(&i);
+            let _ = _map.get_mut(&i);
         }
 
         let mut _map1: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
