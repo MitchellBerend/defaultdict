@@ -89,6 +89,10 @@ where
     }
 
 
+    /// Returns a mutable reference to the value corresponding to the key.
+    /// If the key is not present in the hashmap it will return the default value and insert it in
+    /// the map.
+    ///
     /// # Example
     /// ```
     /// use defaultdict::DefaultBTreeMap;
@@ -105,26 +109,11 @@ where
     where
         K: Hash + Eq + Clone + Ord
     {
-        #[allow(unused_assignments)]
-        let mut rv: Option<&mut V> = Option::None;
-        let mut check: bool = false;
-        for _key in self._inner.keys() {
-            if key == _key {
-                check = true;
-            }
+        let exists = self._inner.keys().any(|k| key == k);
+        if !exists {
+            self.insert(key.clone(), V::default());
         }
-
-        match check {
-            true => {
-                rv = self._inner.get_mut(key);
-            },
-            false => {
-                self.insert(key.clone(), V::default());
-                rv = self._inner.get_mut(key);
-            },
-        };
-
-        rv.unwrap()
+        self._inner.get_mut(key).unwrap()
     }
 
 
