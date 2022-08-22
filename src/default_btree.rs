@@ -82,10 +82,7 @@ where
     where
         K: Eq + Hash + Clone + Ord
     {
-        match self._inner.get(key) {
-            Some(val) => val,
-            None => &self._default,
-        }
+        self._inner.get(key).unwrap_or(&self._default)
     }
 
 
@@ -213,10 +210,7 @@ where
     where
         K: Hash + Eq + Ord
     {
-        match self._inner.remove(key) {
-            Some(value) => value,
-            None => V::default()
-        }
+        self._inner.remove(key).unwrap_or_default()
     }
 
 
