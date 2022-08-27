@@ -18,6 +18,157 @@ mod tests {
     use std::collections::{HashMap, BTreeMap};
 
     #[test]
+    fn clear_hashmap() {
+        let mut map = DefaultHashMap::<i8, i8>::new();
+        map.insert(1,123);
+        map.clear();
+
+        let correct_map = DefaultHashMap::<i8, i8>::new();
+        assert_eq!(correct_map, map);
+    }
+
+    #[test]
+    fn capacity_hashmap() {
+        let mut map = DefaultHashMap::<i8, i8>::new();
+        for i in 0..10 {
+            map.insert(i, i);
+        }
+        map.clear();
+
+        assert_eq!(map.capacity(), 14);
+    }
+
+    #[test]
+    fn drain_hashmap() {
+        let mut map = DefaultHashMap::<i8, i8>::new();
+        for i in 0..10 {
+            map.insert(i, i);
+        }
+        let mut drain: Vec<(i8, i8)> = map.drain().into_iter().collect();
+        drain.sort();
+        let correct_v: Vec<(i8, i8)> = vec!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            (3, 3),
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+
+        assert_eq!(correct_v, drain);
+    }
+
+    #[test]
+    fn entry_hashmap() {
+        use std::collections::hash_map::Entry;
+
+        let mut map: DefaultHashMap<i8, i8> = defaulthashmap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            // (3, 3), missing entry
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+
+        assert_eq!(&0, map.get(&3));
+
+        if let  Entry::Vacant(entry) = map.entry(3) {
+            entry.insert(3);
+        }
+
+        assert_eq!(&3, map.get(&3));
+    }
+
+    #[test]
+    fn get_key_value_hashmap() {
+        let map: DefaultHashMap<i8, String> = defaulthashmap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        for i in 0..10 {
+            let key_value = map.get_key_value(&i);
+            let check = (&i, &format!("{}", i));
+
+            assert_eq!(check, key_value);
+        }
+    }
+
+    #[test]
+    fn into_keys_hashmap() {
+        let map: DefaultHashMap<i8, String> = defaulthashmap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        let correct_v: Vec<i8> = vec!(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        let mut vec_map: Vec<i8> = map.into_keys().collect();
+        vec_map.sort();
+
+        assert_eq!(correct_v, vec_map);
+    }
+
+    #[test]
+    fn into_values_hashmap() {
+        let map: DefaultHashMap<i8, String> = defaulthashmap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        let correct_v: Vec<String> = vec!(
+            String::from("0"),
+            String::from("1"),
+            String::from("2"),
+            String::from("3"),
+            String::from("4"),
+            String::from("5"),
+            String::from("6"),
+            String::from("7"),
+            String::from("8"),
+            String::from("9"),
+        );
+
+        let mut vec_map: Vec<String> = map.into_values().collect();
+        vec_map.sort();
+
+        assert_eq!(correct_v, vec_map);
+    }
+
+    #[test]
     fn default_value_i8_hashmap() {
         let map = DefaultHashMap::<i8, i8>::new();
         assert_eq!(map.get(&1), &0);
@@ -270,9 +421,6 @@ mod tests {
         let _ = map[&0];
     }
 
-
-
-
     #[test]
     fn hashmap_into_defaulthashmap() {
         let mut hashmap: HashMap<u8, i8> = HashMap::new();
@@ -377,6 +525,128 @@ mod tests {
 
 
     // start btree tests
+
+    #[test]
+    fn append_btree() {
+        let mut map1 = DefaultBTreeMap::<i8, i8>::new();
+        let mut map2 = DefaultBTreeMap::<i8, i8>::new();
+
+        for i in 0..10 {
+            if i % 2 == 0 {
+                map1.insert(i, i);
+            } else {
+                map2.insert(i, i);
+            }
+        }
+
+        map1.append(&mut map2)
+    }
+
+    #[test]
+    fn get_key_value_btree() {
+        let map: DefaultBTreeMap<i8, String> = defaultbtreemap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        for i in 0..10 {
+            let key_value = map.get_key_value(&i);
+            let check = (&i, &format!("{}", i));
+
+            assert_eq!(check, key_value);
+        }
+    }
+
+    #[test]
+    fn entry_btree() {
+        use std::collections::btree_map::Entry;
+
+        let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+            (0, 0),
+            (1, 1),
+            (2, 2),
+            // (3, 3), missing entry
+            (4, 4),
+            (5, 5),
+            (6, 6),
+            (7, 7),
+            (8, 8),
+            (9, 9),
+        );
+
+        assert_eq!(&0, map.get(&3));
+
+        if let  Entry::Vacant(entry) = map.entry(3) {
+            entry.insert(3);
+        }
+
+        assert_eq!(&3, map.get(&3));
+    }
+
+    #[test]
+    fn into_keys_btree() {
+        let map: DefaultBTreeMap<i8, String> = defaultbtreemap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        let correct_v: Vec<i8> = vec!(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+
+        let mut vec_map: Vec<i8> = map.into_keys().collect();
+        vec_map.sort();
+
+        assert_eq!(correct_v, vec_map);
+    }
+
+    #[test]
+    fn into_values_btree() {
+        let map: DefaultBTreeMap<i8, String> = defaultbtreemap!(
+            (0, String::from("0")),
+            (1, String::from("1")),
+            (2, String::from("2")),
+            (3, String::from("3")),
+            (4, String::from("4")),
+            (5, String::from("5")),
+            (6, String::from("6")),
+            (7, String::from("7")),
+            (8, String::from("8")),
+            (9, String::from("9")),
+        );
+
+        let correct_v: Vec<String> = vec!(
+            String::from("0"),
+            String::from("1"),
+            String::from("2"),
+            String::from("3"),
+            String::from("4"),
+            String::from("5"),
+            String::from("6"),
+            String::from("7"),
+            String::from("8"),
+            String::from("9"),
+        );
+
+        let mut vec_map: Vec<String> = map.into_values().collect();
+        vec_map.sort();
+
+        assert_eq!(correct_v, vec_map);
+    }
 
     #[test]
     fn default_value_i8_btree() {
