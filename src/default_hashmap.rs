@@ -1,7 +1,7 @@
 #![deny(missing_docs)]
 
 use std::borrow::Borrow;
-use std::collections::{HashMap, hash_map::{
+use std::collections::{HashMap, TryReserveError, hash_map::{
     Drain,
     Entry,
     IntoValues,
@@ -406,6 +406,31 @@ where
     }
 
 
+    /// Reserves capacity for at least `additional` more elements to be inserted in the `HashMap`.
+    /// The collection may reserve more space to speculatively avoid frequent reallocations. After
+    /// calling `reserve`, capacity will be greater than or equal to `self.len() + additional`. Does
+    /// nothing if capacity is already sufficient.
+    ///
+    /// # Panics
+    /// Panics if then new allocation size overflows [`usize`].
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// map.reserve(14);
+    ///
+    /// map.insert(1,10);
+    ///
+    /// println!("{}", map.capacity());
+    /// ```
+    #[inline]
+    pub fn reserve(&mut self, additional: usize) {
+        self._inner.reserve(additional)
+    }
+
+
     /// Retains only the elements specified by the predicate.
     /// In other words, remove all pairs (k, v) for which f(&k, &mut v) returns false. The elements
     /// are visited in unsorted (and unspecified) order.
@@ -431,6 +456,83 @@ where
         F: FnMut(&K, &mut V) -> bool,
     {
         self._inner.retain(func);
+    }
+
+
+    /// Shrinks the capacity of the map with a lower limit. It will drop down no lower than the
+    /// supplied limit while maintaining the internal rules and possibly leaving some space in
+    /// accordance with the resize policy. If the current capacity is less than the lower limit,
+    /// this is a no-op.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// map.reserve(14);
+    ///
+    /// map.insert(1,10);
+    ///
+    /// println!("{}", map.capacity());
+    ///
+    /// map.shrink_to(5);
+    ///
+    /// println!("{}", map.capacity());
+    /// ```
+    #[inline]
+    pub fn shrink_to(&mut self, min_capacity: usize) {
+        self._inner.shrink_to(min_capacity)
+    }
+
+
+    /// Shrinks the capacity of the map as much as possible. It will drop down as much as possible
+    /// while maintaining the internal rules and possibly leaving some space in accordance with the
+    /// resize policy.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// map.reserve(14);
+    ///
+    /// map.insert(1,10);
+    ///
+    /// println!("{}", map.capacity());
+    ///
+    /// map.shrink_to_fit();
+    ///
+    /// println!("{}", map.capacity());
+    /// ```
+    #[inline]
+    pub fn shrink_to_fit(&mut self) {
+        self._inner.shrink_to_fit()
+    }
+
+
+    /// Tries to reserve capacity for at least `additional` more elements to be inserted in the
+    /// [`HashMap`]. The collection may reserve more space to speculatively avoid frequent
+    /// reallocations. After calling `reserve`, capacity will be greater than or equal to
+    /// `self.len() + additional` if it returns `Ok(())`. Does nothing if capacity is already
+    /// sufficient.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// match map.try_reserve(14) {
+    ///     Ok(_) => println!("Reserved 14 units of memory"),
+    ///     Err(e) => println!("{}", e),
+    /// }
+    ///
+    /// map.insert(1,10);
+    ///
+    /// println!("{}", map.capacity());
+    /// ```
+    #[inline]
+    pub fn try_reserve(&mut self, min_capacity: usize) -> Result<(), TryReserveError> {
+        self._inner.try_reserve(min_capacity)
     }
 
 
@@ -478,6 +580,33 @@ where
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
         self._inner.values_mut()
     }
+
+
+    /// Creates an empty [`DefaultHashMap`] with at least the specified capacity. The hash map will
+    /// be able to hold at least `capacity` elements without reallocating. This method is allowed to
+    /// allocate for more elements than `capacity`. If `capacity` is 0, the hash set will not
+    /// allocate.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// let mut map = DefaultHashMap::<i8, i8>::with_capacity(14);
+    ///
+    /// map.insert(1,10);
+    ///
+    /// println!("{}", map.capacity());
+    /// ```
+    #[inline]
+    pub fn with_capacity(capacity: usize) -> Self
+    where
+        K: Eq + Hash,
+        V: Default,
+    {
+        let mut map: DefaultHashMap<K, V> = DefaultHashMap::new();
+        map.reserve(capacity);
+        map
+    }
+
 }
 
 

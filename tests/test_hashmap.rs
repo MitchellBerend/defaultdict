@@ -3,6 +3,87 @@ use defaultdict::*;
 use std::collections::HashMap;
 
 #[test]
+fn with_capacity_hashmap() {
+   let map = DefaultHashMap::<i8, i8>::with_capacity(14);
+
+    assert_eq!(14, map.capacity());
+}
+
+#[test]
+fn try_reserve_hashmap() {
+   let mut map = DefaultHashMap::<i8, i8>::new();
+
+    for i in 0..10 {
+        map.insert(i, i);
+    }
+
+    match map.try_reserve(10) {
+        Ok(_) => (),
+        Err(_) => unreachable!(),
+    }
+
+    assert_eq!(28, map.capacity());
+}
+
+#[test]
+fn reserve_hashmap() {
+   let mut map = DefaultHashMap::<i8, i8>::new();
+
+    for i in 0..10 {
+        map.insert(i, i);
+    }
+
+    map.reserve(10);
+
+    assert_eq!(28, map.capacity());
+
+    map.reserve(20);
+
+    assert_eq!(56, map.capacity());
+}
+
+#[test]
+fn shrink_to_hashmap() {
+   let mut map = DefaultHashMap::<i8, i8>::new();
+
+    for i in 0..10 {
+        map.insert(i, i);
+    }
+
+    map.reserve(10);
+
+    assert_eq!(28, map.capacity());
+
+    map.reserve(20);
+
+    assert_eq!(56, map.capacity());
+
+    map.shrink_to(14);
+
+    assert_eq!(14, map.capacity());
+}
+
+#[test]
+fn shrink_to_fit_hashmap() {
+   let mut map = DefaultHashMap::<i8, i8>::new();
+
+    for i in 0..10 {
+        map.insert(i, i);
+    }
+
+    map.reserve(10);
+
+    assert_eq!(28, map.capacity());
+
+    map.reserve(20);
+
+    assert_eq!(56, map.capacity());
+
+    map.shrink_to_fit();
+
+    assert_eq!(14, map.capacity());
+}
+#[test]
 fn values_mut_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
 
