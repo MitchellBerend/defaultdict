@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 
-
+use std::borrow::Borrow;
 use std::collections::{HashMap, hash_map::{
     Drain,
     Entry,
@@ -9,7 +9,8 @@ use std::collections::{HashMap, hash_map::{
     Iter,
     IterMut,
     Keys,
-    Values
+    Values,
+    ValuesMut,
 }};
 use std::default::Default;
 use std::hash::Hash;
@@ -54,7 +55,7 @@ where
 
     /// Returns the number of elements the map can hold without reallocating.
     ///
-    /// This number is a lower bound; the HashMap<K, V> might be able to hold more, but is
+    /// This number is a lower bound; the `HashMap<K, V>` might be able to hold more, but is
     /// guaranteed to be able to hold at least this many.
     ///
     /// # Example
@@ -90,7 +91,7 @@ where
     }
 
 
-    /// Returns true if the key passed in exists in the HashMap.
+    /// Returns `true` if the key passed in exists in the HashMap.
     ///
     /// # Example
     /// ```
@@ -156,7 +157,7 @@ where
     /// Because this hashmap mimicks the python defaultdict, it will also return a reference to a
     /// value if the key is not present.
     ///
-    /// The key type must implement Hash and Eq.
+    /// The key type must implement [`Hash`] and [`Eq`].
     ///
     /// # Example
     /// ```
@@ -168,18 +169,19 @@ where
     /// println!("{}", map.get(&10));
     /// ```
     #[must_use]
-    pub fn get(&self, key: &K) -> &V
+    pub fn get<Q>(&self, key: &Q) -> &V
     where
-        K: Eq + Hash,
+        K: Borrow<Q>,
+        Q: Hash + Eq + ?Sized,
     {
         self._inner.get(key).unwrap_or(&self._default)
     }
 
 
     /// Returns the key-value pair corresponding to the supplied key.
-    /// The supplied key may be any borrowed form of the map’s key type, but Hash and Eq on the
-    /// borrowed form must match those for the key type.Returns a reference to the value of the key
-    /// passed in.
+    /// The supplied key may be any borrowed form of the map’s key type, but [`Hash`] and [`Eq`] on
+    /// the borrowed form must match those for the key type.Returns a reference to the value of the
+    /// key passed in.
     ///
     /// # Example
     /// ```
@@ -202,6 +204,9 @@ where
     /// Returns a mutable reference to the value corresponding to the key.
     /// If the key is not present in the hashmap it will return the default value and insert it in
     /// the map.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but [`Hash`] and [`Eq`] on the
+    /// borrowed form must match those for the key type.
     ///
     /// # Example
     /// ```
@@ -227,7 +232,8 @@ where
     }
 
 
-    /// Inserts a key value pair into the map.
+    /// Inserts a key value pair into the map. If the map did not have this key present, `None` is
+    /// returned.
     ///
     /// If the map had the key already present it will be overwritten.
     ///
@@ -236,13 +242,15 @@ where
     /// use defaultdict::DefaultHashMap;
     ///
     /// let mut map = DefaultHashMap::<i8, i8>::new();
-    /// map.insert(10, 20)
+    /// map.insert(10, 20);
+    ///
+    /// let old_value = map.insert(10,30);
     /// ```
     #[inline]
-    pub fn insert(&mut self, key: K, value: V)
+    pub fn insert(&mut self, key: K, value: V) -> Option<V>
     where
     {
-        let _ = &self._inner.insert(key, value);
+        self._inner.insert(key, value)
     }
 
 
@@ -284,7 +292,7 @@ where
     }
 
 
-    /// Returns true if the map does not contain any keys.
+    /// Returns `true` if the map does not contain any keys.
     ///
     /// # Example
     /// ```
@@ -300,8 +308,8 @@ where
     }
 
 
-    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is 
-    /// &'a K.
+    /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is
+    /// `&'a K`.
     ///
     /// # Example
     /// ```
@@ -344,6 +352,9 @@ where
     /// Removes a key from the map, returning the value at the key if the key was previously in the
     /// map. If the key is not present in the map it will return the default value.
     ///
+    /// The key may be any borrowed form of the map’s key type, but [`Hash`] and [`Eq`] on the
+    /// borrowed form must match those for the key type.
+    ///
     /// # Example
     /// ```
     /// use defaultdict::DefaultHashMap;
@@ -356,10 +367,42 @@ where
     /// println!("{}", map.remove(&90));
     /// ```
     #[must_use]
-    pub fn remove(&mut self, key: &K) -> V
+    pub fn remove<Q>(&mut self, key: &Q) -> V
     where
+        K: Borrow<Q>,
+        Q: Hash + Eq + ?Sized,
     {
         self._inner.remove(key).unwrap_or_default()
+    }
+
+
+    /// Removes a key from the map, returning the stored key and value if the key was previously in
+    /// the map. If the key is not present in the map, a default value will be returned.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but [`Hash`] and [`Eq`] on the
+    /// borrowed form must match those for the key type.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// for i in 0..10 {
+    ///     map.insert(i, 20);
+    /// }
+    ///
+    /// let entry = map.remove_entry(&0);
+    ///
+    /// let default_entry = map.remove_entry(&0);
+    /// ```
+    #[must_use]
+    pub fn remove_entry(&mut self, key: &K) -> (K, V)
+    where
+        K: Clone,
+        V: Clone,
+    {
+        self._inner.remove_entry(&key).unwrap_or((key.clone(), self._default.to_owned()))
     }
 
 
@@ -374,7 +417,7 @@ where
     /// let mut map: DefaultHashMap<i8, i8> = defaulthashmap!();
     ///
     /// for i in 0..10 {
-    ///     map.insert(i, i)
+    ///     map.insert(i, i);
     /// }
     ///
     /// map.retain(|key, value| {
@@ -413,6 +456,28 @@ where
         self._inner.values()
     }
 
+
+    /// Gets a mutable iterator over the values of the map, in order by key.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    ///
+    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// for i in 0..10 {
+    ///     map.insert(i, i);
+    /// }
+    ///
+    /// for value in map.values_mut() {
+    ///     *value += 1;
+    /// }
+    ///
+    /// ```
+    #[inline]
+    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+        self._inner.values_mut()
+    }
 }
 
 
@@ -471,12 +536,7 @@ where
     type Output = V;
 
     fn index(&self, key: &K) -> &V {
-        match self._inner.get(key) {
-            Some(v) => v,
-            None => {
-                panic!("no entry found for key")
-            }
-        }
+        self._inner.get(key).unwrap_or(&self._default)
     }
 }
 
@@ -570,6 +630,13 @@ where
 macro_rules! defaulthashmap {
 
     // match 1
+    ( ) => {
+        {
+            DefaultHashMap::new()
+        }
+    };
+
+    // match 2
     ( $( ($key:expr, $val:expr) ),* $(,)? ) => {
         {
             let mut map = DefaultHashMap::new();
@@ -580,7 +647,7 @@ macro_rules! defaulthashmap {
         }
     };
 
-    // match 2
+    // match 3
     ( $( $key:expr ),* $(,)? ) => {
         {
             let mut map = DefaultHashMap::new();

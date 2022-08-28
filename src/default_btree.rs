@@ -1,5 +1,6 @@
 #![deny(missing_docs)]
 
+use std::borrow::Borrow;
 use std::collections::{BTreeMap, btree_map::{
     Entry,
     IntoKeys,
@@ -323,18 +324,77 @@ where
     }
 
 
-    /// TODO
-    pub fn range<T, R>(&self, _range: R) -> Range<K, V>
+    /// Constructs a double-ended iterator over a sub-range of elements in the map. The simplest way
+    /// is to use the range syntax `min..max`, thus `range(min..max)` will yield elements from min
+    /// (inclusive) to max (exclusive). The range may also be entered as `(Bound<T>, Bound<T>)`, so
+    /// for example `range((Excluded(4), Included(10)))` will yield a left-exclusive, right-inclusive
+    /// range from 4 to 10.
+    ///
+    /// # Panics
+    /// Panics if range `start > end`. Panics if range `start == end` and both bounds are
+    /// `Excluded`.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    /// use std::ops::Bound::{Included, Excluded};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+    ///
+    /// for i in 0..20 {
+    ///     map.insert(i, i);
+    /// }
+    ///
+    /// for (&key, &val) in map.range((Included(2), Excluded(10))) {
+    ///     println!("key: {}\tvalue: {}", key, val);
+    /// }
+    /// ```
+    #[inline]
+    pub fn range<T, R>(&self, range: R) -> Range<K, V>
     where
+        T: Ord + ?Sized,
+        K: Borrow<T> + Ord,
         R: RangeBounds<T>,
-    {todo!()}
+    {
+        self._inner.range(range)
+    }
 
 
-    /// TODO
-    pub fn range_mut<T, R>(&self, _range: R) -> RangeMut<K, V>
+    /// Constructs a mutable double-ended iterator over a sub-range of elements in the map. The
+    /// simplest way is to use the range syntax `min..max`, thus `range(min..max)` will yield
+    /// elements from min (inclusive) to max (exclusive). The range may also be entered as
+    /// `(Bound<T>, Bound<T>)`, so for example `range((Excluded(4), Included(10)))` will yield a
+    /// left-exclusive, right-inclusive range from 4 to 10.
+    ///
+    /// # Panics
+    /// Panics if range `start > end`. Panics if range `start == end` and both bounds are
+    /// `Excluded`.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    /// use std::ops::Bound::{Included, Excluded};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+    ///
+    /// for i in 0..20 {
+    ///     map.insert(i, i);
+    /// }
+    ///
+    /// for (key, value) in map.range_mut(2..10) {
+    ///     *value += 1;
+    ///     println!("key: {}\tvalue: {}", key, value);
+    /// }
+    /// ```
+    #[inline]
+    pub fn range_mut<T, R>(&mut self, range: R) -> RangeMut<K, V>
     where
+        T: Ord + ?Sized,
+        K: Borrow<T> + Ord,
         R: RangeBounds<T>,
-    {todo!()}
+    {
+        self._inner.range_mut(range)
+    }
 
 
     /// Removes a key from the map, returning the value at the key if the key was previously in the
@@ -359,9 +419,34 @@ where
     }
 
 
-    /// TODO
+    /// Removes a key from the map, returning the stored key and value if the key was previously in
+    /// the map. If the key is not present in the map, a default value will be returned.
+    ///
+    /// The key may be any borrowed form of the map’s key type, but the ordering on the borrowed
+    /// form must match the ordering on the key type.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultBTreeMap;
+    ///
+    /// let mut map = DefaultBTreeMap::<i8, i8>::new();
+    ///
+    /// for i in 0..10 {
+    ///     map.insert(i, 20);
+    /// }
+    ///
+    /// let entry = map.remove_entry(&0);
+    ///
+    /// let default_entry = map.remove_entry(&0);
+    /// ```
     #[must_use]
-    pub fn remove_entry<'a>(&'a mut self, _key: &'a K) -> (&'a K, &'a V) {todo!()}
+    pub fn remove_entry(&mut self, key: &K) -> (K, V)
+    where
+        K: Clone,
+        V: Clone,
+    {
+        self._inner.remove_entry(&key).unwrap_or((key.clone(), self._default.to_owned()))
+    }
 
 
     /// Retains only the elements specified by the predicate.
@@ -393,7 +478,13 @@ where
 
     /// TODO
     #[inline]
-    pub fn split_off(&mut self, _key: K) -> DefaultBTreeMap<K, V> {todo!()}
+    pub fn split_off<Q>(&mut self, key: &Q) -> DefaultBTreeMap<K, V>
+    where
+        Q: Ord + ?Sized,
+        K: Borrow<Q> + Ord + Clone,
+    {
+        self._inner.split_off(key).into()
+    }
 
 
     /// Returns an iterator visiting all values in arbitrary order. The iterator element type is
@@ -417,9 +508,27 @@ where
     }
 
 
-    /// TODO
+    /// Gets a mutable iterator over the values of the map, in order by key.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::DefaultBTreeMap;
+    ///
+    /// let mut map = DefaultBTreeMap::<i8, i8>::new();
+    ///
+    /// for i in 0..10 {
+    ///     map.insert(i, i);
+    /// }
+    ///
+    /// for value in map.values_mut() {
+    ///     *value += 1;
+    /// }
+    ///
+    /// ```
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<K, V> {todo!()}
+    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+        self._inner.values_mut()
+    }
 
 }
 
@@ -479,12 +588,7 @@ where
     type Output = V;
 
     fn index(&self, key: &K) -> &V {
-        match self._inner.get(key) {
-            Some(v) => v,
-            None => {
-                panic!("no entry found for key")
-            }
-        }
+        self._inner.get(key).unwrap_or(&self._default)
     }
 }
 
@@ -577,6 +681,13 @@ where
 macro_rules! defaultbtreemap {
 
     // match 1
+    ( ) => {
+        {
+            DefaultBTreeMap::new()
+        }
+    };
+
+    // match 2
     ( $( ($key:expr, $val:expr) ),* $(,)? ) => {
         {
             let mut map = DefaultBTreeMap::new();
@@ -587,7 +698,7 @@ macro_rules! defaultbtreemap {
         }
     };
 
-    // match 2
+    // match 3
     ( $( $key:expr ),* $(,)? ) => {
         {
             let mut map = DefaultBTreeMap::new();
