@@ -2,16 +2,14 @@ use defaultdict::*;
 
 use std::collections::BTreeMap;
 
-
 #[test]
 fn clear_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,123);
+    map.insert(1, 123);
     map.clear();
 
     let correct_map = DefaultBTreeMap::<i8, i8>::new();
     assert_eq!(correct_map, map);
-
 }
 
 #[test]
@@ -24,21 +22,11 @@ fn split_of_hashbtree() {
 
     let map2 = map1.split_off(&5);
 
-    let correct_map1: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
-        (0, 0),
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let correct_map1: DefaultBTreeMap<i8, i8> =
+        defaultbtreemap!((0, 0), (1, 1), (2, 2), (3, 3), (4, 4),);
 
-    let correct_map2: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
-        (5, 5),
-        (6, 6),
-        (7, 7),
-        (8, 8),
-        (9, 9),
-    );
+    let correct_map2: DefaultBTreeMap<i8, i8> =
+        defaultbtreemap!((5, 5), (6, 6), (7, 7), (8, 8), (9, 9),);
 
     assert_eq!(correct_map1, map1);
     assert_eq!(correct_map2, map2);
@@ -55,7 +43,7 @@ fn value_mut_btree() {
         value.push('a');
     }
 
-    let correct_v: Vec<(i8, String)> = vec!(
+    let correct_v: Vec<(i8, String)> = vec![
         (0, String::from("0a")),
         (1, String::from("1a")),
         (2, String::from("2a")),
@@ -66,7 +54,7 @@ fn value_mut_btree() {
         (7, String::from("7a")),
         (8, String::from("8a")),
         (9, String::from("9a")),
-    );
+    ];
 
     let map_v: Vec<(i8, String)> = map.into_iter().collect();
 
@@ -88,7 +76,7 @@ fn remove_entry_btree() {
     let mut map_v: Vec<(i8, String)> = map.into_iter().collect();
     map_v.sort();
 
-    let correct_v: Vec<(i8, String)> = vec!(
+    let correct_v: Vec<(i8, String)> = vec![
         //(0, String::from("0")), this entry is removed
         (1, String::from("1")),
         (2, String::from("2")),
@@ -99,7 +87,7 @@ fn remove_entry_btree() {
         (7, String::from("7")),
         (8, String::from("8")),
         (9, String::from("9")),
-    );
+    ];
     let correct_entry: (i8, String) = (0, "".into());
 
     assert_eq!(correct_v, map_v);
@@ -164,7 +152,7 @@ fn entry_btree() {
 
     assert_eq!(&0, map.get(&3));
 
-    if let  Entry::Vacant(entry) = map.entry(3) {
+    if let Entry::Vacant(entry) = map.entry(3) {
         entry.insert(3);
     }
 
@@ -186,7 +174,7 @@ fn into_keys_btree() {
         (9, String::from("9")),
     );
 
-    let correct_v: Vec<i8> = vec!(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    let correct_v: Vec<i8> = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     let mut vec_map: Vec<i8> = map.into_keys().collect();
     vec_map.sort();
@@ -209,7 +197,7 @@ fn into_values_btree() {
         (9, String::from("9")),
     );
 
-    let correct_v: Vec<String> = vec!(
+    let correct_v: Vec<String> = vec![
         String::from("0"),
         String::from("1"),
         String::from("2"),
@@ -220,7 +208,7 @@ fn into_values_btree() {
         String::from("7"),
         String::from("8"),
         String::from("9"),
-    );
+    ];
 
     let mut vec_map: Vec<String> = map.into_values().collect();
     vec_map.sort();
@@ -307,14 +295,14 @@ fn default_new_btree() {
 #[test]
 fn non_default_value_i8_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,2);
+    map.insert(1, 2);
     assert_eq!(map.get(&1), &2);
 }
 
 #[test]
 fn insert_remove_default_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,123);
+    map.insert(1, 123);
     let _ = map.remove(&1);
     assert_eq!(map.get(&1), &0);
 }
@@ -329,8 +317,8 @@ fn remove_default_btree() {
 #[test]
 fn collect_keys_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     let mut keys: Vec<&i8> = map.keys().collect();
     keys.sort();
@@ -341,8 +329,8 @@ fn collect_keys_btree() {
 #[test]
 fn collect_values_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     let mut values: Vec<&i8> = map.values().collect();
     values.sort();
@@ -353,8 +341,8 @@ fn collect_values_btree() {
 #[test]
 fn check_len_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     assert_eq!(map.len(), 2);
 }
@@ -362,8 +350,8 @@ fn check_len_btree() {
 #[test]
 fn contains_key_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     assert_eq!(map.contains_key(&1), true);
     assert_eq!(map.contains_key(&2), false);
@@ -382,21 +370,11 @@ fn get_mut_btree() {
 
 #[test]
 fn retain_btree() {
-    let mut map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let mut map: DefaultBTreeMap<i8, u8> = defaultbtreemap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
-    map.retain(|key, _| {
-        key <= &2
-    });
+    map.retain(|key, _| key <= &2);
 
-    let correct_map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
-        (1, 1),
-        (2, 2),
-    );
+    let correct_map: DefaultBTreeMap<i8, u8> = defaultbtreemap!((1, 1), (2, 2),);
 
     assert_eq!(correct_map, map);
 }
@@ -411,26 +389,15 @@ fn is_empty_btree() {
 
     assert_eq!(map.is_empty(), false);
     assert_eq!(map1.is_empty(), true);
-
 }
 
 #[test]
 fn into_iter_no_default_btreemap() {
-    let map: DefaultBTreeMap<i8, u8> = defaultbtreemap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let map: DefaultBTreeMap<i8, u8> = defaultbtreemap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
     let v: Vec<(i8, u8)> = map.into_iter().collect();
 
-    let correct_v: Vec<(i8, u8)> = vec!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let correct_v: Vec<(i8, u8)> = vec![(1, 1), (2, 2), (3, 3), (4, 4)];
 
     assert_eq!(v, correct_v);
 }
@@ -440,11 +407,11 @@ fn into_iter_default_btree() {
     let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
 
     for i in 0..10 {
-        let _  = map.get_mut(&i);
+        let _ = map.get_mut(&i);
     }
 
     let mut v: Vec<(i8, u8)> = map.into_iter().collect();
-    let mut correct_v: Vec<(i8, u8)> = vec!();
+    let mut correct_v: Vec<(i8, u8)> = vec![];
     v.sort();
 
     for i in 0..10 {
@@ -459,11 +426,11 @@ fn borrow_loop_over_default_btree() {
     let mut map: DefaultBTreeMap<i8, u8> = DefaultBTreeMap::new();
 
     for i in 0..10 {
-        let _  = map.get_mut(&i);
+        let _ = map.get_mut(&i);
     }
 
-    let mut v: Vec<(&i8, &u8)> = vec!();
-    let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+    let mut v: Vec<(&i8, &u8)> = vec![];
+    let correct_v: Vec<(&'static i8, &'static u8)> = vec![
         (&0, &0),
         (&1, &0),
         (&2, &0),
@@ -474,7 +441,7 @@ fn borrow_loop_over_default_btree() {
         (&7, &0),
         (&8, &0),
         (&9, &0),
-    );
+    ];
 
     for (key, value) in &map {
         v.push((key, value));
@@ -498,8 +465,8 @@ fn borrow_loop_over_mut_default_btree() {
         (9, 0),
     );
 
-    let mut v: Vec<(&i8, &u8)> = vec!();
-    let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+    let mut v: Vec<(&i8, &u8)> = vec![];
+    let correct_v: Vec<(&'static i8, &'static u8)> = vec![
         (&0, &1),
         (&1, &1),
         (&2, &1),
@@ -510,7 +477,7 @@ fn borrow_loop_over_mut_default_btree() {
         (&7, &1),
         (&8, &1),
         (&9, &1),
-    );
+    ];
 
     for (key, value) in &mut map {
         *value += 1;
@@ -523,7 +490,7 @@ fn borrow_loop_over_mut_default_btree() {
 
 #[test]
 fn index_btree() {
-    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1, 2, 3,);
     let val = map[&1];
 
     assert_eq!(0, val);
@@ -531,7 +498,7 @@ fn index_btree() {
 
 #[test]
 fn index_btree_no_panic() {
-    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1, 2, 3,);
 
     let default_value = map[&0];
 
@@ -544,7 +511,7 @@ fn btree_into_defaultbtree() {
 
     for i in 0..10 {
         btree.insert(i as u8, i as i8);
-    };
+    }
 
     let map: DefaultBTreeMap<u8, i8> = btree.into();
 
@@ -583,21 +550,16 @@ fn defaultbtree_into_btree() {
 
     for i in 0..10 {
         correct_btree.insert(i as u8, i as i8);
-    };
+    }
 
     assert_eq!(correct_btree, btree);
 }
 
 #[test]
 fn macro_test_btree() {
-    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1,2,3,);
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1, 2, 3,);
 
-    let map1: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let map1: DefaultBTreeMap<i8, i8> = defaultbtreemap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
     let mut _map: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
     for i in 1..4 {
@@ -617,12 +579,7 @@ fn macro_test_btree() {
 fn macro_test_slight_change_btree() {
     let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(1, 2, 3);
 
-    let map1: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
-        (1,1),
-        (2,2),
-        (3,3),
-        (4,4)
-    );
+    let map1: DefaultBTreeMap<i8, i8> = defaultbtreemap!((1, 1), (2, 2), (3, 3), (4, 4));
 
     let mut _map: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
     for i in 1..4 {
