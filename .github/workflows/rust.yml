@@ -11,6 +11,7 @@ env:
 jobs:
   format:
     runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo format
     steps:
     - uses: actions/checkout@v3
     - name: Run cargo fmt
@@ -18,6 +19,7 @@ jobs:
 
   clippy:
     runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo clippy
     steps:
     - uses: actions/checkout@v3
     - name: Run cargo clippy
@@ -25,6 +27,7 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo test
     steps:
     - uses: actions/checkout@v3
     - name: Build
