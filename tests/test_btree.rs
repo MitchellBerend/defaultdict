@@ -36,7 +36,7 @@ fn value_mut_btree() {
     let mut map: DefaultBTreeMap<i8, String> = defaultbtreemap!();
 
     for i in 0..10 {
-        let _ = map.insert(i, format!("{}", i));
+        map.insert(i, format!("{}", i));
     }
 
     for value in map.values_mut() {
@@ -66,7 +66,7 @@ fn remove_entry_btree() {
     let mut map: DefaultBTreeMap<i8, String> = defaultbtreemap!();
 
     for i in 0..10 {
-        let _ = map.insert(i, format!("{}", i));
+        map.insert(i, format!("{}", i));
     }
 
     let _ = map.remove_entry(&0);
@@ -415,7 +415,7 @@ fn into_iter_default_btree() {
     v.sort();
 
     for i in 0..10 {
-        correct_v.push((i as i8, 0 as u8));
+        correct_v.push((i as i8, 0_u8));
     }
 
     assert_eq!(v, correct_v);
@@ -568,7 +568,7 @@ fn macro_test_btree() {
 
     let mut _map1: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
     for i in 1..5 {
-        let _ = _map1.insert(i, i);
+        _map1.insert(i, i);
     }
 
     assert_eq!(map, _map);
@@ -588,7 +588,7 @@ fn macro_test_slight_change_btree() {
 
     let mut _map1: DefaultBTreeMap<i8, i8> = DefaultBTreeMap::new();
     for i in 1..5 {
-        let _ = _map1.insert(i, i);
+        _map1.insert(i, i);
     }
 
     assert_eq!(map, _map);

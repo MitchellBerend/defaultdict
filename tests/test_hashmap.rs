@@ -93,7 +93,7 @@ fn drain_hashmap() {
     for i in 0..10 {
         map.insert(i, i);
     }
-    let mut drain: Vec<(i8, i8)> = map.drain().into_iter().collect();
+    let mut drain: Vec<(i8, i8)> = map.drain().collect();
     drain.sort();
     let correct_v: Vec<(i8, i8)> = vec![
         (0, 0),
@@ -356,7 +356,7 @@ fn into_iter_default_hashmap() {
     v.sort();
 
     for i in 0..10 {
-        correct_v.push((i as i8, 0 as u8));
+        correct_v.push((i as i8, 0_u8));
     }
 
     assert_eq!(v, correct_v);

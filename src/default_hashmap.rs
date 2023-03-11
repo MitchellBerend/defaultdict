@@ -181,7 +181,7 @@ where {
     {
         self._inner
             .get_key_value(key)
-            .unwrap_or((&key, &self._default))
+            .unwrap_or((key, &self._default))
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
@@ -377,7 +377,7 @@ where {
         V: Clone,
     {
         self._inner
-            .remove_entry(&key)
+            .remove_entry(key)
             .unwrap_or((key.clone(), self._default.to_owned()))
     }
 
@@ -526,21 +526,21 @@ where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
-    fn from(btree: HashMap<K, V>) -> Self {
+    fn from(hashmap: HashMap<K, V>) -> Self {
         Self {
-            _inner: btree,
+            _inner: hashmap,
             _default: V::default(),
         }
     }
 }
 
-impl<K, V> Into<HashMap<K, V>> for DefaultHashMap<K, V>
+impl<K, V> From<DefaultHashMap<K, V>> for HashMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
-    fn into(self) -> HashMap<K, V> {
-        self._inner
+    fn from(hashmap: DefaultHashMap<K, V>) -> Self {
+            hashmap._inner
     }
 }
 

@@ -165,7 +165,7 @@ where {
     pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&'a K, &'a V) {
         self._inner
             .get_key_value(key)
-            .unwrap_or((&key, &self._default))
+            .unwrap_or((key, &self._default))
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
@@ -388,7 +388,7 @@ where {
     /// ```
     #[must_use]
     pub fn remove(&mut self, key: &K) -> V
-where {
+    {
         self._inner.remove(key).unwrap_or_default()
     }
 
@@ -419,7 +419,7 @@ where {
         V: Clone,
     {
         self._inner
-            .remove_entry(&key)
+            .remove_entry(key)
             .unwrap_or((key.clone(), self._default.to_owned()))
     }
 
@@ -584,13 +584,13 @@ where
     }
 }
 
-impl<K, V> Into<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
+impl<K, V> From<DefaultBTreeMap<K, V>> for BTreeMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
-    fn into(self) -> BTreeMap<K, V> {
-        self._inner
+    fn from(btree: DefaultBTreeMap<K, V>) -> Self {
+        btree._inner
     }
 }
 
