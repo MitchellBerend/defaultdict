@@ -14,7 +14,7 @@ fn values_mut_hashmap() {
         *value += 10;
     }
 
-    let correct_v: Vec<(i8, i8)> = vec!(
+    let correct_v: Vec<(i8, i8)> = vec![
         (0, 10),
         (1, 11),
         (2, 12),
@@ -25,7 +25,7 @@ fn values_mut_hashmap() {
         (7, 17),
         (8, 18),
         (9, 19),
-    );
+    ];
 
     let mut map_v: Vec<(i8, i8)> = map.into_iter().collect();
     map_v.sort();
@@ -47,7 +47,7 @@ fn remove_entry_hashmap() {
     let mut map_v: Vec<(i8, i8)> = map.into_iter().collect();
     map_v.sort();
 
-    let correct_v: Vec<(i8, i8)> = vec!(
+    let correct_v: Vec<(i8, i8)> = vec![
         (0, 0),
         (1, 1),
         (2, 2),
@@ -58,7 +58,7 @@ fn remove_entry_hashmap() {
         (7, 7),
         (8, 8),
         (9, 9),
-    );
+    ];
 
     let correct_entry: (i8, i8) = (5, 0);
 
@@ -69,7 +69,7 @@ fn remove_entry_hashmap() {
 #[test]
 fn clear_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,123);
+    map.insert(1, 123);
     map.clear();
 
     let correct_map = DefaultHashMap::<i8, i8>::new();
@@ -93,9 +93,9 @@ fn drain_hashmap() {
     for i in 0..10 {
         map.insert(i, i);
     }
-    let mut drain: Vec<(i8, i8)> = map.drain().into_iter().collect();
+    let mut drain: Vec<(i8, i8)> = map.drain().collect();
     drain.sort();
-    let correct_v: Vec<(i8, i8)> = vec!(
+    let correct_v: Vec<(i8, i8)> = vec![
         (0, 0),
         (1, 1),
         (2, 2),
@@ -106,7 +106,7 @@ fn drain_hashmap() {
         (7, 7),
         (8, 8),
         (9, 9),
-    );
+    ];
 
     assert_eq!(correct_v, drain);
 }
@@ -130,7 +130,7 @@ fn entry_hashmap() {
 
     assert_eq!(&0, map.get(&3));
 
-    if let  Entry::Vacant(entry) = map.entry(3) {
+    if let Entry::Vacant(entry) = map.entry(3) {
         entry.insert(3);
     }
 
@@ -175,7 +175,7 @@ fn into_keys_hashmap() {
         (9, String::from("9")),
     );
 
-    let correct_v: Vec<i8> = vec!(0, 1, 2, 3, 4, 5, 6, 7, 8, 9);
+    let correct_v: Vec<i8> = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
 
     let mut vec_map: Vec<i8> = map.into_keys().collect();
     vec_map.sort();
@@ -198,7 +198,7 @@ fn into_values_hashmap() {
         (9, String::from("9")),
     );
 
-    let correct_v: Vec<String> = vec!(
+    let correct_v: Vec<String> = vec![
         String::from("0"),
         String::from("1"),
         String::from("2"),
@@ -209,7 +209,7 @@ fn into_values_hashmap() {
         String::from("7"),
         String::from("8"),
         String::from("9"),
-    );
+    ];
 
     let mut vec_map: Vec<String> = map.into_values().collect();
     vec_map.sort();
@@ -235,14 +235,14 @@ fn default_new_hashmap() {
 #[test]
 fn non_default_value_i8_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,2);
+    map.insert(1, 2);
     assert_eq!(map.get(&1), &2);
 }
 
 #[test]
 fn insert_remove_default_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,123);
+    map.insert(1, 123);
     let _ = map.remove(&1);
     assert_eq!(map.get(&1), &0);
 }
@@ -257,8 +257,8 @@ fn remove_default_hashmap() {
 #[test]
 fn collect_keys_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     let mut keys: Vec<&i8> = map.keys().collect();
     keys.sort();
@@ -269,8 +269,8 @@ fn collect_keys_hashmap() {
 #[test]
 fn collect_values_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     let mut values: Vec<&i8> = map.values().collect();
     values.sort();
@@ -281,8 +281,8 @@ fn collect_values_hashmap() {
 #[test]
 fn check_len_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     assert_eq!(map.len(), 2);
 }
@@ -290,8 +290,8 @@ fn check_len_hashmap() {
 #[test]
 fn contains_key_hashmap() {
     let mut map = DefaultHashMap::<i8, i8>::new();
-    map.insert(1,2);
-    map.insert(3,4);
+    map.insert(1, 2);
+    map.insert(3, 4);
 
     assert_eq!(map.contains_key(&1), true);
     assert_eq!(map.contains_key(&2), false);
@@ -310,21 +310,11 @@ fn get_mut_hashmap() {
 
 #[test]
 fn retain_hashmap() {
-    let mut map: DefaultHashMap<i8, u8> = defaulthashmap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let mut map: DefaultHashMap<i8, u8> = defaulthashmap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
-    map.retain(|key, _| {
-        key <= &2
-    });
+    map.retain(|key, _| key <= &2);
 
-    let correct_map: DefaultHashMap<i8, u8> = defaulthashmap!(
-        (1, 1),
-        (2, 2),
-    );
+    let correct_map: DefaultHashMap<i8, u8> = defaulthashmap!((1, 1), (2, 2),);
 
     assert_eq!(correct_map, map);
 }
@@ -339,46 +329,34 @@ fn is_empty_hashmap() {
 
     assert_eq!(map.is_empty(), false);
     assert_eq!(map1.is_empty(), true);
-
 }
 
 #[test]
 fn into_iter_no_default_hashmap() {
-    let map: DefaultHashMap<i8, u8> = defaulthashmap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let map: DefaultHashMap<i8, u8> = defaulthashmap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
     let mut v: Vec<(i8, u8)> = map.into_iter().collect();
     v.sort();
 
-    let correct_v: Vec<(i8, u8)> = vec!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let correct_v: Vec<(i8, u8)> = vec![(1, 1), (2, 2), (3, 3), (4, 4)];
 
     assert_eq!(v, correct_v);
 }
-
 
 #[test]
 fn into_iter_default_hashmap() {
     let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 
     for i in 0..10 {
-        let _  = map.get_mut(&i);
+        let _ = map.get_mut(&i);
     }
 
     let mut v: Vec<(i8, u8)> = map.into_iter().collect();
-    let mut correct_v: Vec<(i8, u8)> = vec!();
+    let mut correct_v: Vec<(i8, u8)> = vec![];
     v.sort();
 
     for i in 0..10 {
-        correct_v.push((i as i8, 0 as u8));
+        correct_v.push((i as i8, 0_u8));
     }
 
     assert_eq!(v, correct_v);
@@ -389,11 +367,11 @@ fn borrow_loop_over_default_hashmap() {
     let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 
     for i in 0..10 {
-        let _  = map.get_mut(&i);
+        let _ = map.get_mut(&i);
     }
 
-    let mut v: Vec<(&i8, &u8)> = vec!();
-    let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+    let mut v: Vec<(&i8, &u8)> = vec![];
+    let correct_v: Vec<(&'static i8, &'static u8)> = vec![
         (&0, &0),
         (&1, &0),
         (&2, &0),
@@ -404,7 +382,7 @@ fn borrow_loop_over_default_hashmap() {
         (&7, &0),
         (&8, &0),
         (&9, &0),
-    );
+    ];
 
     for (key, value) in &map {
         v.push((key, value));
@@ -429,8 +407,8 @@ fn borrow_loop_over_mut_default_hashmap() {
         (9, 0),
     );
 
-    let mut v: Vec<(&i8, &u8)> = vec!();
-    let correct_v: Vec<(&'static i8, &'static u8)> = vec!(
+    let mut v: Vec<(&i8, &u8)> = vec![];
+    let correct_v: Vec<(&'static i8, &'static u8)> = vec![
         (&0, &1),
         (&1, &1),
         (&2, &1),
@@ -441,7 +419,7 @@ fn borrow_loop_over_mut_default_hashmap() {
         (&7, &1),
         (&8, &1),
         (&9, &1),
-    );
+    ];
 
     for (key, value) in &mut map {
         *value += 1;
@@ -452,10 +430,9 @@ fn borrow_loop_over_mut_default_hashmap() {
     assert_eq!(correct_v, v);
 }
 
-
 #[test]
 fn index_hashmap() {
-    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1, 2, 3,);
     let val = map[&1];
 
     assert_eq!(0, val);
@@ -463,7 +440,7 @@ fn index_hashmap() {
 
 #[test]
 fn index_hashmap_no_panic() {
-    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1, 2, 3,);
 
     // this should panic since there is no 0 key
     let default_value = map[&0];
@@ -477,7 +454,7 @@ fn hashmap_into_defaulthashmap() {
 
     for i in 0..10 {
         hashmap.insert(i as u8, i as i8);
-    };
+    }
 
     let map: DefaultHashMap<u8, i8> = hashmap.into();
 
@@ -496,7 +473,6 @@ fn hashmap_into_defaulthashmap() {
 
     assert_eq!(correct_map, map);
 }
-
 
 #[test]
 fn defaulthashmap_into_hashmap() {
@@ -517,21 +493,16 @@ fn defaulthashmap_into_hashmap() {
 
     for i in 0..10 {
         correct_hashmap.insert(i as u8, i as i8);
-    };
+    }
 
     assert_eq!(correct_hashmap, hashmap);
 }
 
 #[test]
 fn macro_test_hashmap() {
-    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1,2,3,);
+    let map: DefaultHashMap<i8, i8> = defaulthashmap!(1, 2, 3,);
 
-    let map1: DefaultHashMap<i8, i8> = defaulthashmap!(
-        (1, 1),
-        (2, 2),
-        (3, 3),
-        (4, 4),
-    );
+    let map1: DefaultHashMap<i8, i8> = defaulthashmap!((1, 1), (2, 2), (3, 3), (4, 4),);
 
     let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
     for i in 1..4 {
@@ -551,12 +522,7 @@ fn macro_test_hashmap() {
 fn macro_test_slight_change_hashmap() {
     let map: DefaultHashMap<i8, i8> = defaulthashmap!(1, 2, 3);
 
-    let map1: DefaultHashMap<i8, i8> = defaulthashmap!(
-        (1,1),
-        (2,2),
-        (3,3),
-        (4,4)
-    );
+    let map1: DefaultHashMap<i8, i8> = defaulthashmap!((1, 1), (2, 2), (3, 3), (4, 4));
 
     let mut _map: DefaultHashMap<i8, i8> = DefaultHashMap::new();
     for i in 1..4 {

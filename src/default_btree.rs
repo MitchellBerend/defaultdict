@@ -1,22 +1,15 @@
 #![deny(missing_docs)]
 
 use std::borrow::Borrow;
-use std::collections::{BTreeMap, btree_map::{
-    Entry,
-    IntoKeys,
-    IntoValues,
-    Iter,
-    IterMut,
-    Keys,
-    Range,
-    RangeMut,
-    Values,
-    ValuesMut,
-}};
+use std::collections::{
+    btree_map::{
+        Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, Range, RangeMut, Values, ValuesMut,
+    },
+    BTreeMap,
+};
 use std::default::Default;
 use std::hash::Hash;
 use std::ops::{Index, RangeBounds};
-
 
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`BTreeMap`], it also requires the
@@ -30,7 +23,6 @@ where
     _inner: BTreeMap<K, V>,
     _default: V,
 }
-
 
 impl<K, V> DefaultBTreeMap<K, V>
 where
@@ -52,7 +44,6 @@ where
             _default: V::default(),
         }
     }
-
 
     /// Moves all elements from other into self, leaving other empty.
     ///
@@ -82,7 +73,6 @@ where
         self._inner.append(&mut other._inner);
     }
 
-
     /// Clears the map, removing all elements.
     ///
     /// # Example
@@ -102,7 +92,6 @@ where
         self._inner.clear()
     }
 
-
     /// Returns true if the key passed in exists in the BTreeMap.
     ///
     /// # Example
@@ -116,11 +105,9 @@ where
     /// ```
     #[inline]
     pub fn contains_key(&self, key: &K) -> bool
-    where
-    {
+where {
         self._inner.contains_key(key)
     }
-
 
     /// Gets the given key's corresponding entry in the map for in-place manipulation.
     ///
@@ -139,7 +126,6 @@ where
         self._inner.entry(key)
     }
 
-
     /// Returns a reference to the value of the key passed in.
     /// Because this btreemap mimicks the python defaultdict, it will also return a reference to a
     /// value if the key is not present.
@@ -157,11 +143,9 @@ where
     /// ```
     #[must_use]
     pub fn get(&self, key: &K) -> &V
-    where
-    {
+where {
         self._inner.get(key).unwrap_or(&self._default)
     }
-
 
     /// Returns the key-value pair corresponding to the supplied key.
     ///
@@ -179,7 +163,9 @@ where
     /// ```
     #[inline]
     pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&'a K, &'a V) {
-        self._inner.get_key_value(key).unwrap_or((&key, &self._default))
+        self._inner
+            .get_key_value(key)
+            .unwrap_or((key, &self._default))
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
@@ -209,7 +195,6 @@ where
         self._inner.get_mut(key).unwrap()
     }
 
-
     /// Inserts a key value pair into the map.
     ///
     /// If the map had the key already present it will be overwritten.
@@ -222,12 +207,9 @@ where
     /// map.insert(10, 20)
     /// ```
     #[inline]
-    pub fn insert(&mut self, key: K, value: V)
-    where
-    {
+    pub fn insert(&mut self, key: K, value: V) {
         let _ = &self._inner.insert(key, value);
     }
-
 
     /// Creates a consuming iterator visiting all the keys in sorted order. The map cannot be used
     /// after calling this. The iterator element type is `K`.
@@ -247,7 +229,6 @@ where
         self._inner.into_keys()
     }
 
-
     /// Creates a consuming iterator visiting all the values in sorted order. The map cannot be used
     /// after calling this. The iterator element type is `V`.
     ///
@@ -266,7 +247,6 @@ where
         self._inner.into_values()
     }
 
-
     /// Returns true if the map does not contain any keys.
     ///
     /// # Example
@@ -281,7 +261,6 @@ where
     pub fn is_empty(&self) -> bool {
         self._inner.is_empty()
     }
-
 
     /// Returns an iterator visiting all keys in arbitrary order. The iterator element type is
     /// &'a K.
@@ -303,7 +282,6 @@ where
         self._inner.keys()
     }
 
-
     /// Returns the length of the keys in the map.
     ///
     /// # Example
@@ -322,7 +300,6 @@ where
     pub fn len(&self) -> usize {
         self._inner.len()
     }
-
 
     /// Constructs a double-ended iterator over a sub-range of elements in the map. The simplest way
     /// is to use the range syntax `min..max`, thus `range(min..max)` will yield elements from min
@@ -358,7 +335,6 @@ where
     {
         self._inner.range(range)
     }
-
 
     /// Constructs a mutable double-ended iterator over a sub-range of elements in the map. The
     /// simplest way is to use the range syntax `min..max`, thus `range(min..max)` will yield
@@ -396,7 +372,6 @@ where
         self._inner.range_mut(range)
     }
 
-
     /// Removes a key from the map, returning the value at the key if the key was previously in the
     /// map. If the key is not present in the map it will return the default value.
     ///
@@ -413,11 +388,9 @@ where
     /// ```
     #[must_use]
     pub fn remove(&mut self, key: &K) -> V
-    where
     {
         self._inner.remove(key).unwrap_or_default()
     }
-
 
     /// Removes a key from the map, returning the stored key and value if the key was previously in
     /// the map. If the key is not present in the map, a default value will be returned.
@@ -445,9 +418,10 @@ where
         K: Clone,
         V: Clone,
     {
-        self._inner.remove_entry(&key).unwrap_or((key.clone(), self._default.to_owned()))
+        self._inner
+            .remove_entry(key)
+            .unwrap_or((key.clone(), self._default.to_owned()))
     }
-
 
     /// Retains only the elements specified by the predicate.
     /// In other words, remove all pairs (k, v) for which f(&k, &mut v) returns false. The elements
@@ -475,7 +449,6 @@ where
         self._inner.retain(func);
     }
 
-
     /// TODO
     #[inline]
     pub fn split_off<Q>(&mut self, key: &Q) -> DefaultBTreeMap<K, V>
@@ -485,7 +458,6 @@ where
     {
         self._inner.split_off(key).into()
     }
-
 
     /// Returns an iterator visiting all values in arbitrary order. The iterator element type is
     /// &'a V.
@@ -506,7 +478,6 @@ where
     pub fn values(&self) -> Values<'_, K, V> {
         self._inner.values()
     }
-
 
     /// Gets a mutable iterator over the values of the map, in order by key.
     ///
@@ -529,9 +500,7 @@ where
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
         self._inner.values_mut()
     }
-
 }
-
 
 impl<K, V> Default for DefaultBTreeMap<K, V>
 where
@@ -543,7 +512,6 @@ where
     }
 }
 
-
 impl<K, V> IntoIterator for DefaultBTreeMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
@@ -553,7 +521,7 @@ where
     type IntoIter = DefaultBTreeMapIter<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let mut keys: Vec<K> = vec!();
+        let mut keys: Vec<K> = vec![];
         for k in self.keys() {
             keys.insert(0, k.to_owned());
         }
@@ -565,20 +533,18 @@ where
     }
 }
 
-
 impl<'a, K, V> IntoIterator for &'a DefaultBTreeMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
-    type Item = (&'a K,&'a V);
+    type Item = (&'a K, &'a V);
     type IntoIter = Iter<'a, K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
         self._inner.iter()
     }
 }
-
 
 impl<K, V> Index<&K> for DefaultBTreeMap<K, V>
 where
@@ -591,7 +557,6 @@ where
         self._inner.get(key).unwrap_or(&self._default)
     }
 }
-
 
 impl<'a, K, V> IntoIterator for &'a mut DefaultBTreeMap<K, V>
 where
@@ -606,7 +571,6 @@ where
     }
 }
 
-
 impl<K, V> From<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
@@ -618,20 +582,17 @@ where
             _default: V::default(),
         }
     }
-
 }
 
-
-impl<K, V> Into<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
+impl<K, V> From<DefaultBTreeMap<K, V>> for BTreeMap<K, V>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
 {
-    fn into(self) -> BTreeMap<K, V> {
-        self._inner
+    fn from(btree: DefaultBTreeMap<K, V>) -> Self {
+        btree._inner
     }
 }
-
 
 impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
 where
@@ -644,12 +605,11 @@ where
             Some(key) => {
                 let val = self._defaultbtree.remove(&key);
                 Option::Some((key, val))
-            },
+            }
             None => Option::None,
         }
     }
 }
-
 
 pub struct DefaultBTreeMapIter<K, V>
 where
@@ -657,9 +617,8 @@ where
     V: Default,
 {
     _defaultbtree: DefaultBTreeMap<K, V>,
-    keys: Vec<K>
+    keys: Vec<K>,
 }
-
 
 #[macro_export]
 /// A quick way to instantiate a BTreeMap.
