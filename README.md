@@ -1,8 +1,9 @@
 [![Crates.io](https://img.shields.io/crates/v/defaultdict.svg)](https://crates.io/crates/defaultdict)
 [![codecov](https://codecov.io/gh/MitchellBerend/defaultdict/branch/master/graph/badge.svg?token=S1VNH7GNGP)](https://codecov.io/gh/MitchellBerend/defaultdict)
 
-This project will most likely not receive updates.
+This project will most likely not receive feature updates.
 ---
+
 
 # Motivation
 This serves as an utility library and an example project. It has no dependencies
