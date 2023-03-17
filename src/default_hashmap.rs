@@ -20,7 +20,7 @@ use std::ops::Index;
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct DefaultHashMap<K, V>
 where
     K: Eq + Hash,
