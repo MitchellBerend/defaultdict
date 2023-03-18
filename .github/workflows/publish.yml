@@ -17,6 +17,7 @@ jobs:
         CARGO_AUTH_TOKEN: ${{ secrets.CARGO_AUTH_TOKEN }}
 
   run:
+    needs: dry-run
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo publish
     steps:
