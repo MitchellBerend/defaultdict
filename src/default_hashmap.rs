@@ -132,7 +132,7 @@ where
     /// ```
     #[inline]
     pub fn entry(&mut self, key: K) -> Entry<K, V>
-where {
+    {
         self._inner.entry(key)
     }
 
@@ -230,7 +230,7 @@ where {
     /// ```
     #[inline]
     pub fn insert(&mut self, key: K, value: V) -> Option<V>
-where {
+    {
         self._inner.insert(key, value)
     }
 
@@ -425,7 +425,7 @@ where {
     /// ```
     #[inline]
     pub fn values(&self) -> Values<'_, K, V>
-where {
+    {
         self._inner.values()
     }
 
