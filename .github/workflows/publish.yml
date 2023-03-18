@@ -3,7 +3,7 @@ name: Publish
 on:
   push:
     tags:
-      - "\d\.\d{1,2}\.\d*"
+      - "\d+\.\d+\.\d*"
 
 jobs:
   dry-run:
