@@ -540,7 +540,7 @@ where
     V: Default,
 {
     fn from(hashmap: DefaultHashMap<K, V>) -> Self {
-            hashmap._inner
+        hashmap._inner
     }
 }
 

@@ -3,7 +3,8 @@
 use std::borrow::Borrow;
 use std::collections::{
     btree_map::{
-        Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, Range, RangeMut, Values, ValuesMut,
+        Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry, Range, RangeMut, Values,
+        ValuesMut,
     },
     BTreeMap,
 };
@@ -104,8 +105,7 @@ where
     /// println!("{}", map.contains_key(&10));
     /// ```
     #[inline]
-    pub fn contains_key(&self, key: &K) -> bool
-where {
+    pub fn contains_key(&self, key: &K) -> bool {
         self._inner.contains_key(key)
     }
 
@@ -126,6 +126,52 @@ where {
         self._inner.entry(key)
     }
 
+    /// Returns the first entry in the map for in-place manipulation. The key of this entry is the
+    /// minimum key in the map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let entry = map.first_entry();
+    /// ```
+    #[inline]
+    pub fn first_entry(&mut self) -> Option<OccupiedEntry<K, V>>
+    where
+        K: Ord,
+    {
+        self._inner.first_entry()
+    }
+
+    /// Returns the first key-value pair in the map. The key in this pair is the minimum key in the
+    /// map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let entry = map.first_key_value();
+    /// ```
+    #[inline]
+    pub fn first_key_value(&self) -> Option<(&K, &V)>
+    where
+        K: Ord,
+    {
+        self._inner.first_key_value()
+    }
+
     /// Returns a reference to the value of the key passed in.
     /// Because this btreemap mimicks the python defaultdict, it will also return a reference to a
     /// value if the key is not present.
@@ -142,8 +188,7 @@ where {
     /// println!("{}", map.get(&10));
     /// ```
     #[must_use]
-    pub fn get(&self, key: &K) -> &V
-where {
+    pub fn get(&self, key: &K) -> &V {
         self._inner.get(key).unwrap_or(&self._default)
     }
 
@@ -282,6 +327,53 @@ where {
         self._inner.keys()
     }
 
+    /// Returns the last entry in the map for in-place manipulation. The key of this entry is the
+    /// maximum key in the map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let entry = map.last_entry();
+    /// ```
+    #[inline]
+    pub fn last_entry(&mut self) -> Option<OccupiedEntry<K, V>>
+    where
+        K: Ord,
+    {
+        self._inner.last_entry()
+    }
+
+    /// Returns the last key-value pair in the map. The key in this pair is the maximum key in the
+    /// map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let entry = map.last_key_value();
+    ///
+    /// assert_eq!(entry, Option::Some((&1, &2)))
+    /// ```
+    pub fn last_key_value(&self) -> Option<(&K, &V)>
+    where
+        K: Ord,
+    {
+        self._inner.last_key_value()
+    }
+
     /// Returns the length of the keys in the map.
     ///
     /// # Example
@@ -299,6 +391,56 @@ where {
     #[inline]
     pub fn len(&self) -> usize {
         self._inner.len()
+    }
+
+    /// Removes and returns the first element in the map. The key of this element is the minimum key
+    /// that was in the map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let first = map.pop_first();
+    /// let second = map.pop_first();
+    ///
+    /// assert!(second.is_none())
+    /// ```
+    pub fn pop_first(&mut self) -> Option<(K, V)>
+    where
+        K: Ord,
+    {
+        self._inner.pop_first()
+    }
+
+    /// Removes and returns the last element in the map. The key of this element is the maximum key
+    /// that was in the map.
+    ///
+    /// This method will return a None variant if the BTreeMap is empty.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    /// );
+    ///
+    /// let first = map.pop_last();
+    /// let second = map.pop_last();
+    ///
+    /// assert!(second.is_none())
+    /// ```
+    pub fn pop_last(&mut self) -> Option<(K, V)>
+    where
+        K: Ord,
+    {
+        self._inner.pop_last()
     }
 
     /// Constructs a double-ended iterator over a sub-range of elements in the map. The simplest way
@@ -387,8 +529,7 @@ where {
     /// println!("{}", map.remove(&90));
     /// ```
     #[must_use]
-    pub fn remove(&mut self, key: &K) -> V
-    {
+    pub fn remove(&mut self, key: &K) -> V {
         self._inner.remove(key).unwrap_or_default()
     }
 
