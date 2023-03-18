@@ -22,6 +22,10 @@ jobs:
     name: ubuntu / stable / cargo publish
     steps:
     - uses: actions/checkout@v3
+    - name: Run cargo login
+      run: cargo login $CARGO_AUTH_TOKEN
+      env:
+        CARGO_AUTH_TOKEN: ${{ secrets.CARGO_AUTH_TOKEN }}
     - name: Run cargo publish
       run: cargo publish --verbose
       env:
