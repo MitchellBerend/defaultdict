@@ -1,0 +1,27 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "\d\.\d{1,2}\.\d*"
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo publish --dry-run
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run cargo publish --dry-run
+      run: cargo publish --dry-run --verbose
+        env:
+          CARGO_AUTH_TOKEN: ${{ secrets.CARGO_AUTH_TOKEN }}
+
+  run:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo publish
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run cargo publish
+      run: cargo publish --verbose
+        env:
+          CARGO_AUTH_TOKEN: ${{ secrets.CARGO_AUTH_TOKEN }}
