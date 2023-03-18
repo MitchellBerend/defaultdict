@@ -1,0 +1,65 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - "\d\.\d{1,2}\.\d*"
+
+jobs:
+  dry-run:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo publish --dry-run
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run cargo fmt
+      run: cargo fmt
+
+  clippy:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo clippy
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run cargo clippy
+      run: cargo clippy
+
+  test:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo test
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo test --verbose
+
+  test-docs:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / cargo test doc
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo test --doc --verbose
+
+  #https://github.com/jonhoo/rust-ci-conf/blob/main/.github/workflows/test.yml
+  coverage:
+    runs-on: ubuntu-latest
+    name: ubuntu / stable / coverage
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Install stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - name: cargo install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: cargo generate-lockfile
+        if: hashFiles('Cargo.lock') == ''
+        uses: actions-rs/cargo@v1
+        with:
+          command: generate-lockfile
+      - name: cargo llvm-cov
+        run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v3
+        with:
+          fail_ci_if_error: true
