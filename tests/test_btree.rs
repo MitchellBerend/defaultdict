@@ -31,6 +31,7 @@ fn split_of_hashbtree() {
     assert_eq!(correct_map1, map1);
     assert_eq!(correct_map2, map2);
 }
+
 #[test]
 fn value_mut_btree() {
     let mut map: DefaultBTreeMap<i8, String> = defaultbtreemap!();
@@ -157,6 +158,33 @@ fn entry_btree() {
     }
 
     assert_eq!(&3, map.get(&3));
+}
+
+#[test]
+fn last_entry_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((6, 7), (7, 7), (8, 8), (9, 9),);
+
+    let mut entry: OccupiedEntry<i8, i8> = map.last_entry().unwrap();
+
+    assert_eq!(&9, entry.key());
+    assert_eq!(&9, entry.get());
+
+    *entry.get_mut() += 8;
+
+    assert_eq!(entry.get(), &17);
+}
+
+#[test]
+fn last_entry_empty_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+
+    let entry: Option<OccupiedEntry<i8, i8>> = map.last_entry();
+
+    assert!(entry.is_none())
 }
 
 #[test]
