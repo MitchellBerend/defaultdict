@@ -31,6 +31,7 @@ fn split_of_hashbtree() {
     assert_eq!(correct_map1, map1);
     assert_eq!(correct_map2, map2);
 }
+
 #[test]
 fn value_mut_btree() {
     let mut map: DefaultBTreeMap<i8, String> = defaultbtreemap!();
@@ -157,6 +158,78 @@ fn entry_btree() {
     }
 
     assert_eq!(&3, map.get(&3));
+}
+
+#[test]
+fn last_entry_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((6, 7), (7, 7), (8, 8), (9, 9),);
+
+    let mut entry: OccupiedEntry<i8, i8> = map.last_entry().unwrap();
+
+    assert_eq!(&9, entry.key());
+    assert_eq!(&9, entry.get());
+
+    *entry.get_mut() += 8;
+
+    assert_eq!(entry.get(), &17);
+}
+
+#[test]
+fn last_entry_empty_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+
+    let entry: Option<OccupiedEntry<i8, i8>> = map.last_entry();
+
+    assert!(entry.is_none())
+}
+
+#[test]
+fn first_entry_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((6, 7), (7, 7), (8, 8), (9, 9),);
+
+    let mut entry: OccupiedEntry<i8, i8> = map.first_entry().unwrap();
+
+    assert_eq!(&6, entry.key());
+    assert_eq!(&7, entry.get());
+
+    *entry.get_mut() += 8;
+
+    assert_eq!(entry.get(), &15);
+}
+
+#[test]
+fn first_entry_empty_btree() {
+    use std::collections::btree_map::OccupiedEntry;
+
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+
+    let entry: Option<OccupiedEntry<i8, i8>> = map.first_entry();
+
+    assert!(entry.is_none())
+}
+
+#[test]
+fn first_key_value_btree() {
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((6, 7), (7, 7), (8, 8), (9, 9),);
+
+    let entry: (&i8, &i8) = map.first_key_value().unwrap();
+
+    assert_eq!(entry, (&6, &7));
+}
+
+#[test]
+fn first_key_value_empty_btree() {
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!();
+
+    let entry: Option<(&i8, &i8)> = map.first_key_value();
+
+    assert!(entry.is_none())
 }
 
 #[test]
@@ -327,6 +400,26 @@ fn collect_keys_btree() {
 }
 
 #[test]
+fn check_last_key_values() {
+    let map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((1, 2), (3, 4),);
+
+    let first = map.last_key_value();
+
+    assert_eq!(first, Option::Some((&3, &4)));
+}
+
+#[test]
+fn check_pop_last_twice() {
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((3, 4),);
+
+    let first = map.pop_last();
+    let second = map.pop_last();
+
+    assert_eq!(first, Option::Some((3, 4)));
+    assert!(second.is_none());
+}
+
+#[test]
 fn collect_values_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
     map.insert(1, 2);
@@ -345,6 +438,19 @@ fn check_len_btree() {
     map.insert(3, 4);
 
     assert_eq!(map.len(), 2);
+}
+
+#[test]
+fn pop_first() {
+    let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!((1, 2), (3, 4),);
+
+    let first = map.pop_first().unwrap();
+    let second = map.pop_first().unwrap();
+    let third = map.pop_first();
+
+    assert_eq!(first, (1, 2));
+    assert_eq!(second, (3, 4));
+    assert!(third.is_none());
 }
 
 #[test]
