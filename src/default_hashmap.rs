@@ -131,8 +131,7 @@ where
     /// let entry = map.entry(10);
     /// ```
     #[inline]
-    pub fn entry(&mut self, key: K) -> Entry<K, V>
-    {
+    pub fn entry(&mut self, key: K) -> Entry<K, V> {
         self._inner.entry(key)
     }
 
@@ -229,8 +228,7 @@ where
     /// let old_value = map.insert(10,30);
     /// ```
     #[inline]
-    pub fn insert(&mut self, key: K, value: V) -> Option<V>
-    {
+    pub fn insert(&mut self, key: K, value: V) -> Option<V> {
         self._inner.insert(key, value)
     }
 
@@ -424,8 +422,7 @@ where
     /// println!("{:?}", map.values());
     /// ```
     #[inline]
-    pub fn values(&self) -> Values<'_, K, V>
-    {
+    pub fn values(&self) -> Values<'_, K, V> {
         self._inner.values()
     }
 

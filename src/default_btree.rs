@@ -9,7 +9,6 @@ use std::collections::{
     BTreeMap,
 };
 use std::default::Default;
-use std::hash::Hash;
 use std::ops::{Index, RangeBounds};
 
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
@@ -18,7 +17,7 @@ use std::ops::{Index, RangeBounds};
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord,
+    K: Eq + Ord,
     V: Default,
 {
     _inner: BTreeMap<K, V>,
@@ -27,7 +26,7 @@ where
 
 impl<K, V> DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord,
+    K: Eq + Ord,
     V: Default,
 {
     /// Creates an empty [`DefaultBTreeMap`].
@@ -176,7 +175,7 @@ where
     /// Because this btreemap mimicks the python defaultdict, it will also return a reference to a
     /// value if the key is not present.
     ///
-    /// The key type must implement Hash and Eq.
+    /// The key type must implement Eq.
     ///
     /// # Example
     /// ```
@@ -231,7 +230,7 @@ where
     #[must_use]
     pub fn get_mut(&mut self, key: &K) -> &mut V
     where
-        K: Hash + Eq + Clone + Ord,
+        K: Eq + Clone + Ord,
     {
         let exists = self._inner.keys().any(|k| key == k);
         if !exists {
@@ -645,7 +644,7 @@ where
 
 impl<K, V> Default for DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord,
+    K: Eq + Ord,
     V: Default,
 {
     fn default() -> Self {
@@ -655,7 +654,7 @@ where
 
 impl<K, V> IntoIterator for DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     type Item = (K, V);
@@ -676,7 +675,7 @@ where
 
 impl<'a, K, V> IntoIterator for &'a DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     type Item = (&'a K, &'a V);
@@ -689,7 +688,7 @@ where
 
 impl<K, V> Index<&K> for DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     type Output = V;
@@ -701,7 +700,7 @@ where
 
 impl<'a, K, V> IntoIterator for &'a mut DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     type Item = (&'a K, &'a mut V);
@@ -714,7 +713,7 @@ where
 
 impl<K, V> From<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     fn from(btree: BTreeMap<K, V>) -> Self {
@@ -727,7 +726,7 @@ where
 
 impl<K, V> From<DefaultBTreeMap<K, V>> for BTreeMap<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     fn from(btree: DefaultBTreeMap<K, V>) -> Self {
@@ -737,7 +736,7 @@ where
 
 impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Ord + Clone,
     V: Default,
 {
     type Item = (K, V);
@@ -754,7 +753,7 @@ where
 
 pub struct DefaultBTreeMapIter<K, V>
 where
-    K: Eq + Hash + Ord,
+    K: Eq + Ord,
     V: Default,
 {
     _defaultbtree: DefaultBTreeMap<K, V>,
