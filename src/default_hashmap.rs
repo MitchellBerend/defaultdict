@@ -8,7 +8,6 @@ use std::collections::{
 use std::default::Default;
 use std::hash::Hash;
 use std::ops::Index;
-
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
@@ -34,6 +33,12 @@ where
     /// use defaultdict::DefaultHashMap;
     ///
     /// let map = DefaultHashMap::<i8, i8>::new();
+    ///
+    /// // This map is empty
+    /// let collected: Vec<(i8, i8)> = map.into_iter().collect();
+    /// let empty: Vec<(i8, i8)> = vec![];
+    ///
+    /// assert_eq!(empty, collected);
     /// ```
     #[must_use]
     pub fn new() -> Self {
@@ -72,7 +77,11 @@ where
     /// map.insert(10, 20);
     /// map.clear();
     ///
-    /// println!("{:#?}", map);
+    /// // This map is empty
+    /// let collected: Vec<(i8, i8)> = map.into_iter().collect();
+    /// let empty: Vec<(i8, i8)> = vec![];
+    ///
+    /// assert_eq!(empty, collected);
     /// ```
     #[inline]
     pub fn clear(&mut self) {
@@ -88,7 +97,7 @@ where
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.contains_key(&10));
+    /// assert!(map.contains_key(&10));
     /// ```
     #[inline]
     pub fn contains_key(&self, key: &K) -> bool
@@ -112,7 +121,15 @@ where
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// let contents = map.drain();
+    /// let contents: Vec<(i8, i8)> = map.drain().into_iter().collect();
+    /// assert_eq!(vec![(10, 20)], contents);
+    ///
+    ///
+    /// // The map is empty
+    /// let collected: Vec<(i8, i8)> = map.into_iter().collect();
+    /// let empty: Vec<(i8, i8)> = vec![];
+    ///
+    /// assert_eq!(empty, collected);
     /// ```
     #[inline]
     pub fn drain(&mut self) -> Drain<K, V> {
@@ -123,12 +140,19 @@ where
     ///
     /// # Example
     /// ```
+    /// use std::collections::hash_map::Entry;
     /// use defaultdict::DefaultHashMap;
     ///
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// let entry = map.entry(10);
+    /// assert_eq!(&20, map.get(&10));
+    ///
+    /// if let Entry::Occupied(inner) = map.entry(10) {
+    ///     *inner.into_mut() += 10;
+    /// };
+    ///
+    /// assert_eq!(&30, map.get(&10));
     /// ```
     #[inline]
     pub fn entry(&mut self, key: K) -> Entry<K, V> {
@@ -148,7 +172,8 @@ where
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.get(&10));
+    /// assert_eq!(&20, map.get(&10));
+    /// assert_eq!(&0, map.get(&20));
     /// ```
     #[must_use]
     pub fn get<Q>(&self, key: &Q) -> &V
@@ -171,7 +196,9 @@ where
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{:#?}", map.get_key_value(&10));
+    /// let key_value: (&i8, &i8) = map.get_key_value(&10);
+    ///
+    /// assert_eq!((&10, &20), key_value);
     /// ```
     #[must_use]
     pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&K, &V)
@@ -199,7 +226,7 @@ where
     ///
     /// *number = 100;
     ///
-    /// println!("{}", map.get(&10));
+    /// assert_eq!(&100, map.get(&10));
     /// ```
     #[must_use]
     pub fn get_mut(&mut self, key: &K) -> &mut V
@@ -225,7 +252,10 @@ where
     /// let mut map = DefaultHashMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// let old_value = map.insert(10,30);
+    /// let old_value = map.insert(10, 30).unwrap();
+    ///
+    /// assert_eq!(&30, map.get(&10));
+    /// assert_eq!(20, old_value);
     /// ```
     #[inline]
     pub fn insert(&mut self, key: K, value: V) -> Option<V> {
@@ -243,7 +273,10 @@ where
     /// map.insert(10, 20);
     /// map.insert(30, 40);
     ///
-    /// let mut vec: Vec<i8> = map.into_keys().collect();
+    /// let mut collected: Vec<i8> = map.into_keys().collect();
+    /// collected.sort();
+    ///
+    /// assert_eq!(vec![10, 30], collected);
     /// ```
     #[inline]
     pub fn into_keys(self) -> IntoKeys<K, V> {
@@ -261,7 +294,10 @@ where
     /// map.insert(10, 20);
     /// map.insert(30, 40);
     ///
-    /// let mut vec: Vec<i8> = map.into_values().collect();
+    /// let mut collected: Vec<i8> = map.into_values().collect();
+    /// collected.sort();
+    ///
+    /// assert_eq!(vec![20, 40], collected);
     /// ```
     #[inline]
     pub fn into_values(self) -> IntoValues<K, V> {
@@ -274,9 +310,9 @@ where
     /// ```
     /// use defaultdict::DefaultHashMap;
     ///
-    /// let mut map = DefaultHashMap::<i8, i8>::new();
+    /// let map = DefaultHashMap::<i8, i8>::new();
     ///
-    /// println!("{}", map.is_empty());
+    /// assert!(map.is_empty());
     /// ```
     #[inline]
     pub fn is_empty(&self) -> bool {
@@ -296,7 +332,10 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{:?}", map.keys());
+    /// let mut collected: Vec<&i8> = map.keys().collect();
+    /// collected.sort();
+    ///
+    /// assert_eq!(vec![&10, &11, &12, &13], collected);
     /// ```
     #[inline]
     pub fn keys(&self) -> Keys<'_, K, V> {
@@ -315,7 +354,7 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{}", map.len());
+    /// assert_eq!(4, map.len());
     /// ```
     #[inline]
     pub fn len(&self) -> usize {
@@ -338,6 +377,8 @@ where
     /// println!("{}", map.remove(&10));
     ///
     /// println!("{}", map.remove(&90));
+    ///
+    /// assert!(map.is_empty());
     /// ```
     #[must_use]
     pub fn remove<Q>(&mut self, key: &Q) -> V
@@ -367,6 +408,9 @@ where
     /// let entry = map.remove_entry(&0);
     ///
     /// let default_entry = map.remove_entry(&0);
+    ///
+    /// assert_eq!((1, 20), map.remove_entry(&1));
+    /// assert_eq!((1, 0), map.remove_entry(&1));
     /// ```
     #[must_use]
     pub fn remove_entry(&mut self, key: &K) -> (K, V)
@@ -397,7 +441,11 @@ where
     ///     key <= &2
     /// });
     ///
-    /// println!("{:?}", map);
+    /// let mut collected: Vec<(i8, i8)> = map.into_iter().collect();
+    /// collected.sort();
+    /// let golden: Vec<(i8, i8)> = vec![(0, 0), (1, 1), (2, 2)];
+    ///
+    /// assert_eq!(golden, collected);
     /// ```
     pub fn retain<F>(&mut self, func: F)
     where
@@ -419,7 +467,11 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{:?}", map.values());
+    /// let mut collected: Vec<&i8> = map.values().collect();
+    /// collected.sort();
+    /// let golden: Vec<&i8> = vec![&20, &21, &22, &23];
+    ///
+    /// assert_eq!(golden, collected);
     /// ```
     #[inline]
     pub fn values(&self) -> Values<'_, K, V> {
@@ -442,6 +494,11 @@ where
     ///     *value += 1;
     /// }
     ///
+    /// let mut collected: Vec<&i8> = map.values().collect();
+    /// collected.sort();
+    /// let golden: Vec<&i8> = vec![&1, &2, &3, &4, &5, &6, &7, &8, &9, &10];
+    ///
+    /// assert_eq!(golden, collected);
     /// ```
     #[inline]
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
