@@ -36,6 +36,7 @@ where
     /// use defaultdict::DefaultBTreeMap;
     ///
     /// let map = DefaultBTreeMap::<i8, i8>::new();
+    /// assert_eq!(&0, map.get(&123));
     /// ```
     #[must_use]
     pub fn new() -> Self {
@@ -62,7 +63,9 @@ where
     ///     }
     /// }
     ///
-    /// map1.append(&mut map2)
+    /// assert_eq!(&3, map2.get(&3));
+    /// map1.append(&mut map2);
+    /// assert_eq!(&3, map1.get(&3));
     /// ```
     #[inline]
     pub fn append(&mut self, other: &mut DefaultBTreeMap<K, V>)
@@ -85,7 +88,9 @@ where
     ///     map.insert(i, i);
     /// }
     ///
-    /// map.clear()
+    /// map.clear();
+    ///
+    /// assert_eq!(&0, map.get(&3));
     /// ```
     #[inline]
     pub fn clear(&mut self) {
@@ -101,7 +106,7 @@ where
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.contains_key(&10));
+    /// assert!(map.contains_key(&10));
     /// ```
     #[inline]
     pub fn contains_key(&self, key: &K) -> bool {
@@ -112,13 +117,18 @@ where
     ///
     /// # Example
     /// ```
+    /// use std::collections::btree_map::Entry;
     /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
     ///
     /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
     ///     (1, 2),
     /// );
     ///
-    /// let entry = map.entry(1);
+    /// if let Entry::Occupied(inner) = map.entry(1) {
+    ///     *inner.into_mut() += 10;
+    /// };
+    ///
+    /// assert_eq!(&12, map.get(&1));
     /// ```
     #[inline]
     pub fn entry(&mut self, key: K) -> Entry<K, V> {
@@ -136,9 +146,14 @@ where
     ///
     /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
     ///     (1, 2),
+    ///     (2, 3),
     /// );
     ///
-    /// let entry = map.first_entry();
+    /// if let Some(inner) = map.first_entry() {
+    ///     *inner.into_mut() += 10;
+    /// };
+    ///
+    /// assert_eq!(&12, map.get(&1));
     /// ```
     #[inline]
     pub fn first_entry(&mut self) -> Option<OccupiedEntry<K, V>>
@@ -159,9 +174,13 @@ where
     ///
     /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
     ///     (1, 2),
+    ///     (2, 3),
     /// );
     ///
-    /// let entry = map.first_key_value();
+    /// if let Some((key, value)) = map.first_key_value() {
+    ///     assert_eq!(&1, key);
+    ///     assert_eq!(&2, value);
+    /// };
     /// ```
     #[inline]
     pub fn first_key_value(&self) -> Option<(&K, &V)>
@@ -184,7 +203,8 @@ where
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.get(&10));
+    /// assert_eq!(&0, map.get(&1));
+    /// assert_eq!(&20, map.get(&10));
     /// ```
     #[must_use]
     pub fn get(&self, key: &K) -> &V {
@@ -203,7 +223,10 @@ where
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{:#?}", map.get_key_value(&10));
+    /// let (key, value) = map.get_key_value(&10);
+    ///
+    /// assert_eq!(&10, key);
+    /// assert_eq!(&20, value);
     /// ```
     #[inline]
     pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&'a K, &'a V) {
@@ -222,10 +245,9 @@ where
     ///
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     /// let number = map.get_mut(&10);
-    ///
     /// *number = 100;
     ///
-    /// println!("{}", map.get(&10));
+    /// assert_eq!(&100, map.get(&10));
     /// ```
     #[must_use]
     pub fn get_mut(&mut self, key: &K) -> &mut V
@@ -248,7 +270,9 @@ where
     /// use defaultdict::DefaultBTreeMap;
     ///
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
-    /// map.insert(10, 20)
+    /// map.insert(10, 20);
+    ///
+    /// assert_eq!(&20, map.get(&10));
     /// ```
     #[inline]
     pub fn insert(&mut self, key: K, value: V) {
@@ -267,6 +291,10 @@ where
     /// map.insert(30, 40);
     ///
     /// let mut vec: Vec<i8> = map.into_keys().collect();
+    ///
+    /// let golden: Vec<i8> = vec![10, 30];
+    ///
+    /// assert_eq!(vec, golden);
     /// ```
     #[inline]
     pub fn into_keys(self) -> IntoKeys<K, V> {
@@ -285,6 +313,10 @@ where
     /// map.insert(30, 40);
     ///
     /// let mut vec: Vec<i8> = map.into_values().collect();
+    ///
+    /// let golden: Vec<i8> = vec![20, 40];
+    ///
+    /// assert_eq!(vec, golden);
     /// ```
     #[inline]
     pub fn into_values(self) -> IntoValues<K, V> {
@@ -299,7 +331,7 @@ where
     ///
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     ///
-    /// println!("{}", map.is_empty());
+    /// assert!(map.is_empty());
     /// ```
     #[inline]
     pub fn is_empty(&self) -> bool {
@@ -319,7 +351,11 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{:?}", map.keys());
+    /// let vec: Vec<&i8> = map.keys().collect();
+    ///
+    /// let golden: Vec<&i8> = vec![&10, &11, &12, &13];
+    ///
+    /// assert_eq!(vec, golden);
     /// ```
     #[inline]
     pub fn keys(&self) -> Keys<'_, K, V> {
@@ -337,9 +373,14 @@ where
     ///
     /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
     ///     (1, 2),
+    ///     (3, 4)
     /// );
     ///
-    /// let entry = map.last_entry();
+    /// if let Some(inner) = map.last_entry() {
+    ///     *inner.into_mut() += 10;
+    /// };
+    ///
+    /// assert_eq!(&14, map.get(&3));
     /// ```
     #[inline]
     pub fn last_entry(&mut self) -> Option<OccupiedEntry<K, V>>
@@ -385,7 +426,7 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{}", map.len());
+    /// assert_eq!(4, map.len());
     /// ```
     #[inline]
     pub fn len(&self) -> usize {
@@ -408,7 +449,8 @@ where
     /// let first = map.pop_first();
     /// let second = map.pop_first();
     ///
-    /// assert!(second.is_none())
+    /// assert_eq!((1, 2), first.unwrap());
+    /// assert!(second.is_none());
     /// ```
     pub fn pop_first(&mut self) -> Option<(K, V)>
     where
@@ -433,7 +475,8 @@ where
     /// let first = map.pop_last();
     /// let second = map.pop_last();
     ///
-    /// assert!(second.is_none())
+    /// assert_eq!((1, 2), first.unwrap());
+    /// assert!(second.is_none());
     /// ```
     pub fn pop_last(&mut self) -> Option<(K, V)>
     where
@@ -462,10 +505,19 @@ where
     /// for i in 0..20 {
     ///     map.insert(i, i);
     /// }
+    /// let vec: Vec<(&i8, &i8)> = map.range((Included(2), Excluded(10))).collect();
+    /// let golden: Vec<(&i8, &i8)> =  vec![
+    ///     (&2, &2),
+    ///     (&3, &3),
+    ///     (&4, &4),
+    ///     (&5, &5),
+    ///     (&6, &6),
+    ///     (&7, &7),
+    ///     (&8, &8),
+    ///     (&9, &9),
+    /// ];
     ///
-    /// for (&key, &val) in map.range((Included(2), Excluded(10))) {
-    ///     println!("key: {}\tvalue: {}", key, val);
-    /// }
+    /// assert_eq!(vec, golden);
     /// ```
     #[inline]
     pub fn range<T, R>(&self, range: R) -> Range<K, V>
