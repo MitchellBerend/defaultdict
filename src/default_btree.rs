@@ -575,9 +575,8 @@ where
     /// let mut map = DefaultBTreeMap::<i8, i8>::new();
     /// map.insert(10, 20);
     ///
-    /// println!("{}", map.remove(&10));
-    ///
-    /// println!("{}", map.remove(&90));
+    /// assert_eq!(20, map.remove(&10));
+    /// assert_eq!(0, map.remove(&90));
     /// ```
     #[must_use]
     pub fn remove(&mut self, key: &K) -> V {
@@ -602,7 +601,8 @@ where
     ///
     /// let entry = map.remove_entry(&0);
     ///
-    /// let default_entry = map.remove_entry(&0);
+    /// assert_eq!((5, 20), map.remove_entry(&5));
+    /// assert_eq!((5, 0) , map.remove_entry(&5));
     /// ```
     #[must_use]
     pub fn remove_entry(&mut self, key: &K) -> (K, V)
@@ -631,8 +631,13 @@ where
     /// map.retain(|key, value| {
     ///     key <= &2
     /// });
+    /// let golden = defaultbtreemap!(
+    ///     (0, 0),
+    ///     (1, 1),
+    ///     (2, 2),
+    /// );
     ///
-    /// println!("{:?}", map);
+    /// assert_eq!(golden, map);
     /// ```
     pub fn retain<F>(&mut self, func: F)
     where
@@ -664,7 +669,11 @@ where
     /// map.insert(12, 22);
     /// map.insert(13, 23);
     ///
-    /// println!("{:?}", map.values());
+    /// let vec: Vec<&i8> = map.values().collect();
+    /// let golden: Vec<&i8> = vec![&20, &21, &22, &23];
+    ///
+    ///
+    /// assert_eq!(golden, vec);
     /// ```
     #[inline]
     pub fn values(&self) -> Values<'_, K, V> {
@@ -687,6 +696,9 @@ where
     ///     *value += 1;
     /// }
     ///
+    /// for i in 0..10 {
+    ///     assert_eq!(&(i + 1), map.get(&i))
+    /// }
     /// ```
     #[inline]
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
