@@ -363,6 +363,16 @@ fn into_iter_default_hashmap() {
 }
 
 #[test]
+fn from_iter_hashmap() {
+    let data = [(1, 1), (2, 2), (3, 3), (4, 4)];
+    let map: DefaultHashMap<i8, u8> = data.iter().cloned().collect();
+
+    let correct_map: DefaultHashMap<i8, u8> = defaulthashmap!((1, 1), (2, 2), (3, 3), (4, 4));
+
+    assert_eq!(map, correct_map);
+}
+
+#[test]
 fn borrow_loop_over_default_hashmap() {
     let mut map: DefaultHashMap<i8, u8> = DefaultHashMap::new();
 

@@ -651,6 +651,21 @@ where
     }
 }
 
+impl<K, V, S> FromIterator<(K, V)> for DefaultHashMap<K, V, S>
+where
+    K: Eq + Hash,
+    V: Default,
+    S: BuildHasher + Default,
+{
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        let mut map = DefaultHashMap::with_hasher(Default::default());
+        for (k, v) in iter {
+            let _ = map.insert(k, v);
+        }
+        map
+    }
+}
+
 #[macro_export]
 /// A quick way to instantiate a HashMap.
 ///
