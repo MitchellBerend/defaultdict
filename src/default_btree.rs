@@ -790,6 +790,20 @@ where
     }
 }
 
+impl<K, V> FromIterator<(K, V)> for DefaultBTreeMap<K, V>
+where
+    K: Ord,
+    V: Default,
+{
+    fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
+        let mut map = DefaultBTreeMap::default();
+        for (k, v) in iter {
+            let _ = map.insert(k, v);
+        }
+        map
+    }
+}
+
 #[macro_export]
 /// A quick way to instantiate a BTreeMap.
 ///
