@@ -1,11 +1,9 @@
 #![deny(missing_docs)]
 
 use std::borrow::Borrow;
-use std::collections::{
-    hash_map::{
-        Drain, Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, RandomState, Values, ValuesMut,
-    },
-    HashMap,
+use std::collections::hash_map::{
+    Drain, Entry, HashMap, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, RandomState,
+    Values, ValuesMut,
 };
 use std::default::Default;
 use std::hash::{BuildHasher, Hash};
@@ -580,18 +578,10 @@ where
     S: BuildHasher,
 {
     type Item = (K, V);
-    type IntoIter = DefaultHashMapIter<K, V, S>;
+    type IntoIter = IntoIter<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let mut keys: Vec<K> = vec![];
-        for k in self.keys() {
-            keys.push(k.to_owned());
-        }
-
-        DefaultHashMapIter {
-            _defaulthashmap: self,
-            keys,
-        }
+        self._inner.into_iter()
     }
 }
 
@@ -659,35 +649,6 @@ where
     fn from(hashmap: DefaultHashMap<K, V, S>) -> Self {
         hashmap._inner
     }
-}
-
-impl<K, V, S> Iterator for DefaultHashMapIter<K, V, S>
-where
-    K: Eq + Hash,
-    V: Default,
-    S: BuildHasher,
-{
-    type Item = (K, V);
-
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.keys.pop() {
-            Some(key) => {
-                let val = self._defaulthashmap.remove(&key);
-                Option::Some((key, val))
-            }
-            None => Option::None,
-        }
-    }
-}
-
-pub struct DefaultHashMapIter<K, V, S>
-where
-    K: Eq + Hash,
-    V: Default,
-    S: BuildHasher,
-{
-    _defaulthashmap: DefaultHashMap<K, V, S>,
-    keys: Vec<K>,
 }
 
 #[macro_export]
