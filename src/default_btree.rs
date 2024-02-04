@@ -3,8 +3,8 @@
 use std::borrow::Borrow;
 use std::collections::{
     btree_map::{
-        Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry, Range, RangeMut, Values,
-        ValuesMut,
+        Entry, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry, Range, RangeMut,
+        Values, ValuesMut,
     },
     BTreeMap,
 };
@@ -722,18 +722,10 @@ where
     V: Default,
 {
     type Item = (K, V);
-    type IntoIter = DefaultBTreeMapIter<K, V>;
+    type IntoIter = IntoIter<K, V>;
 
     fn into_iter(self) -> Self::IntoIter {
-        let mut keys: Vec<K> = vec![];
-        for k in self.keys() {
-            keys.insert(0, k.to_owned());
-        }
-
-        DefaultBTreeMapIter {
-            _defaultbtree: self,
-            keys,
-        }
+        self._inner.into_iter()
     }
 }
 
@@ -796,32 +788,6 @@ where
     fn from(btree: DefaultBTreeMap<K, V>) -> Self {
         btree._inner
     }
-}
-
-impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
-where
-    K: Eq + Ord,
-    V: Default,
-{
-    type Item = (K, V);
-    fn next(&mut self) -> Option<Self::Item> {
-        match self.keys.pop() {
-            Some(key) => {
-                let val = self._defaultbtree.remove(&key);
-                Option::Some((key, val))
-            }
-            None => Option::None,
-        }
-    }
-}
-
-pub struct DefaultBTreeMapIter<K, V>
-where
-    K: Eq + Ord,
-    V: Default,
-{
-    _defaultbtree: DefaultBTreeMap<K, V>,
-    keys: Vec<K>,
 }
 
 #[macro_export]
