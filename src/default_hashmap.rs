@@ -2,26 +2,28 @@
 
 use std::borrow::Borrow;
 use std::collections::{
-    hash_map::{Drain, Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, Values, ValuesMut},
+    hash_map::{
+        Drain, Entry, IntoKeys, IntoValues, Iter, IterMut, Keys, RandomState, Values, ValuesMut,
+    },
     HashMap,
 };
 use std::default::Default;
-use std::hash::Hash;
+use std::hash::{BuildHasher, Hash};
 use std::ops::Index;
 /// This struct mimicks the behaviour of a python defaultdict. This means alongside the traitbounds
 /// that apply on the key and value that are inherited from the [`HashMap`], it also requires the
 /// [`Default`] trait be implemented on the value type.
-#[derive(Clone, Debug, Eq, PartialEq)]
-pub struct DefaultHashMap<K, V>
+#[derive(Clone, Debug)]
+pub struct DefaultHashMap<K, V, S = RandomState>
 where
     K: Eq + Hash,
     V: Default,
 {
-    _inner: HashMap<K, V>,
+    _inner: HashMap<K, V, S>,
     _default: V,
 }
 
-impl<K, V> DefaultHashMap<K, V>
+impl<K, V> DefaultHashMap<K, V, RandomState>
 where
     K: Eq + Hash,
     V: Default,
@@ -44,6 +46,42 @@ where
     pub fn new() -> Self {
         Self {
             _inner: HashMap::new(),
+            _default: V::default(),
+        }
+    }
+}
+
+impl<K, V, S> DefaultHashMap<K, V, S>
+where
+    K: Eq + Hash,
+    V: Default,
+    S: BuildHasher,
+{
+    /// Creates an empty [`DefaultHashMap`] which will use the given hash builder to hash
+    /// keys.
+    ///
+    /// Warning: `hash_builder` is normally randomly generated, and
+    /// is designed to allow HashMaps to be resistant to attacks that
+    /// cause many collisions and very poor performance. Setting it
+    /// manually using this function can expose a DoS attack vector.
+    ///
+    /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
+    /// the HashMap to be useful, see its documentation for details.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// use std::collections::hash_map::RandomState;
+    ///
+    /// let s = RandomState::new();
+    /// let mut map = DefaultHashMap::with_hasher(s);
+    /// map.insert(1, 2);
+    /// ```
+    #[inline]
+    pub fn with_hasher(hash_builder: S) -> Self {
+        DefaultHashMap {
+            _inner: HashMap::with_hasher(hash_builder),
             _default: V::default(),
         }
     }
@@ -516,13 +554,33 @@ where
     }
 }
 
-impl<K, V> IntoIterator for DefaultHashMap<K, V>
+impl<K, V, S> PartialEq for DefaultHashMap<K, V, S>
+where
+    K: Eq + Hash,
+    V: PartialEq + Default,
+    S: BuildHasher,
+{
+    fn eq(&self, other: &DefaultHashMap<K, V, S>) -> bool {
+        self._inner == other._inner && self._default == other._default
+    }
+}
+
+impl<K, V, S> Eq for DefaultHashMap<K, V, S>
+where
+    K: Eq + Hash,
+    V: Eq + Default,
+    S: BuildHasher,
+{
+}
+
+impl<K, V, S> IntoIterator for DefaultHashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
     type Item = (K, V);
-    type IntoIter = DefaultHashMapIter<K, V>;
+    type IntoIter = DefaultHashMapIter<K, V, S>;
 
     fn into_iter(self) -> Self::IntoIter {
         let mut keys: Vec<K> = vec![];
@@ -537,10 +595,11 @@ where
     }
 }
 
-impl<'a, K, V> IntoIterator for &'a DefaultHashMap<K, V>
+impl<'a, K, V, S> IntoIterator for &'a DefaultHashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
     type Item = (&'a K, &'a V);
     type IntoIter = Iter<'a, K, V>;
@@ -550,10 +609,11 @@ where
     }
 }
 
-impl<K, V> Index<&K> for DefaultHashMap<K, V>
+impl<K, V, S> Index<&K> for DefaultHashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
     type Output = V;
 
@@ -562,10 +622,11 @@ where
     }
 }
 
-impl<'a, K, V> IntoIterator for &'a mut DefaultHashMap<K, V>
+impl<'a, K, V, S> IntoIterator for &'a mut DefaultHashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
     type Item = (&'a K, &'a mut V);
     type IntoIter = IterMut<'a, K, V>;
@@ -575,12 +636,13 @@ where
     }
 }
 
-impl<K, V> From<HashMap<K, V>> for DefaultHashMap<K, V>
+impl<K, V, S> From<HashMap<K, V, S>> for DefaultHashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
-    fn from(hashmap: HashMap<K, V>) -> Self {
+    fn from(hashmap: HashMap<K, V, S>) -> Self {
         Self {
             _inner: hashmap,
             _default: V::default(),
@@ -588,20 +650,22 @@ where
     }
 }
 
-impl<K, V> From<DefaultHashMap<K, V>> for HashMap<K, V>
+impl<K, V, S> From<DefaultHashMap<K, V, S>> for HashMap<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
-    fn from(hashmap: DefaultHashMap<K, V>) -> Self {
+    fn from(hashmap: DefaultHashMap<K, V, S>) -> Self {
         hashmap._inner
     }
 }
 
-impl<K, V> Iterator for DefaultHashMapIter<K, V>
+impl<K, V, S> Iterator for DefaultHashMapIter<K, V, S>
 where
     K: Eq + Hash + Ord + Clone,
     V: Default,
+    S: BuildHasher,
 {
     type Item = (K, V);
 
@@ -616,12 +680,13 @@ where
     }
 }
 
-pub struct DefaultHashMapIter<K, V>
+pub struct DefaultHashMapIter<K, V, S>
 where
     K: Eq + Hash + Ord,
     V: Default,
+    S: BuildHasher,
 {
-    _defaulthashmap: DefaultHashMap<K, V>,
+    _defaulthashmap: DefaultHashMap<K, V, S>,
     keys: Vec<K>,
 }
 
