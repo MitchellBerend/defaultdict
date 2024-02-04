@@ -575,7 +575,7 @@ where
 
 impl<K, V, S> IntoIterator for DefaultHashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash + Clone,
     V: Default,
     S: BuildHasher,
 {
@@ -597,7 +597,7 @@ where
 
 impl<'a, K, V, S> IntoIterator for &'a DefaultHashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -611,7 +611,7 @@ where
 
 impl<K, V, S> Index<&K> for DefaultHashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -624,7 +624,7 @@ where
 
 impl<'a, K, V, S> IntoIterator for &'a mut DefaultHashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -638,7 +638,7 @@ where
 
 impl<K, V, S> From<HashMap<K, V, S>> for DefaultHashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -652,7 +652,7 @@ where
 
 impl<K, V, S> From<DefaultHashMap<K, V, S>> for HashMap<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -663,7 +663,7 @@ where
 
 impl<K, V, S> Iterator for DefaultHashMapIter<K, V, S>
 where
-    K: Eq + Hash + Ord + Clone,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {
@@ -682,7 +682,7 @@ where
 
 pub struct DefaultHashMapIter<K, V, S>
 where
-    K: Eq + Hash + Ord,
+    K: Eq + Hash,
     V: Default,
     S: BuildHasher,
 {

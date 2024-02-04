@@ -739,7 +739,7 @@ where
 
 impl<'a, K, V> IntoIterator for &'a DefaultBTreeMap<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     type Item = (&'a K, &'a V);
@@ -752,7 +752,7 @@ where
 
 impl<K, V> Index<&K> for DefaultBTreeMap<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     type Output = V;
@@ -764,7 +764,7 @@ where
 
 impl<'a, K, V> IntoIterator for &'a mut DefaultBTreeMap<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     type Item = (&'a K, &'a mut V);
@@ -777,7 +777,7 @@ where
 
 impl<K, V> From<BTreeMap<K, V>> for DefaultBTreeMap<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     fn from(btree: BTreeMap<K, V>) -> Self {
@@ -790,7 +790,7 @@ where
 
 impl<K, V> From<DefaultBTreeMap<K, V>> for BTreeMap<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     fn from(btree: DefaultBTreeMap<K, V>) -> Self {
@@ -800,7 +800,7 @@ where
 
 impl<K, V> Iterator for DefaultBTreeMapIter<K, V>
 where
-    K: Eq + Ord + Clone,
+    K: Eq + Ord,
     V: Default,
 {
     type Item = (K, V);
