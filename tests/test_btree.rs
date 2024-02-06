@@ -700,3 +700,13 @@ fn macro_test_slight_change_btree() {
     assert_eq!(map, _map);
     assert_eq!(map1, _map1);
 }
+
+#[test]
+fn from_iter_btreemap() {
+    let data = [(1, 1), (2, 2), (3, 3), (4, 4)];
+    let map: DefaultBTreeMap<i8, u8> = data.iter().cloned().collect();
+
+    let correct_map: DefaultBTreeMap<i8, u8> = defaultbtreemap!((1, 1), (2, 2), (3, 3), (4, 4));
+
+    assert_eq!(map, correct_map);
+}
