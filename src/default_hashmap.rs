@@ -55,35 +55,6 @@ where
     V: Default,
     S: BuildHasher,
 {
-    /// Creates an empty [`DefaultHashMap`] which will use the given hash builder to hash
-    /// keys.
-    ///
-    /// Warning: `hash_builder` is normally randomly generated, and
-    /// is designed to allow HashMaps to be resistant to attacks that
-    /// cause many collisions and very poor performance. Setting it
-    /// manually using this function can expose a DoS attack vector.
-    ///
-    /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
-    /// the HashMap to be useful, see its documentation for details.
-    ///
-    /// # Examples
-    ///
-    /// ```
-    /// use defaultdict::DefaultHashMap;
-    /// use std::collections::hash_map::RandomState;
-    ///
-    /// let s = RandomState::new();
-    /// let mut map = DefaultHashMap::with_hasher(s);
-    /// map.insert(1, 2);
-    /// ```
-    #[inline]
-    pub fn with_hasher(hash_builder: S) -> Self {
-        DefaultHashMap {
-            _inner: HashMap::with_hasher(hash_builder),
-            _default: V::default(),
-        }
-    }
-
     /// Returns the number of elements the map can hold without reallocating.
     ///
     /// This number is a lower bound; the `HashMap<K, V>` might be able to hold more, but is
@@ -539,6 +510,35 @@ where
     #[inline]
     pub fn values_mut(&mut self) -> ValuesMut<K, V> {
         self._inner.values_mut()
+    }
+
+    /// Creates an empty [`DefaultHashMap`] which will use the given hash builder to hash
+    /// keys.
+    ///
+    /// Warning: `hash_builder` is normally randomly generated, and
+    /// is designed to allow HashMaps to be resistant to attacks that
+    /// cause many collisions and very poor performance. Setting it
+    /// manually using this function can expose a DoS attack vector.
+    ///
+    /// The `hash_builder` passed should implement the [`BuildHasher`] trait for
+    /// the HashMap to be useful, see its documentation for details.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use defaultdict::DefaultHashMap;
+    /// use std::collections::hash_map::RandomState;
+    ///
+    /// let s = RandomState::new();
+    /// let mut map = DefaultHashMap::with_hasher(s);
+    /// map.insert(1, 2);
+    /// ```
+    #[inline]
+    pub fn with_hasher(hash_builder: S) -> Self {
+        DefaultHashMap {
+            _inner: HashMap::with_hasher(hash_builder),
+            _default: V::default(),
+        }
     }
 }
 
