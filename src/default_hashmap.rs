@@ -2,8 +2,8 @@
 
 use std::borrow::Borrow;
 use std::collections::hash_map::{
-    Drain, Entry, HashMap, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, RandomState,
-    Values, ValuesMut,
+    Drain, Entry, ExtractIf, HashMap, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys,
+    RandomState, Values, ValuesMut,
 };
 use std::default::Default;
 use std::hash::{BuildHasher, Hash};
@@ -166,6 +166,32 @@ where
         self._inner.entry(key)
     }
 
+    /// Creates an iterator which uses a closure to determine if an element should be removed.
+    ///
+    /// If the closure returns true, the element is removed from the map and yielded. If the closure
+    /// returns false, or panics, the element remains in the map and will not be yielded.
+    ///
+    /// Note that extract_if lets you mutate every value in the filter closure, regardless of
+    /// whether you choose to keep or remove it.
+    pub fn extract_if<F>(&mut self, predicate: F) -> ExtractIf<'_, K, V, F>
+    where
+        F: FnMut(&K, &mut V) -> bool,
+    {
+        self._inner.extract_if(predicate)
+    }
+
+    /// Attempts to get mutable references to N values in the map at once.
+    ///
+    /// Returns an array of length N with the results of each query. For soundness, at most one
+    /// mutable reference will be returned to any value. None will be used if the key is missing.
+    pub fn get_disjoint_mut<Q, const N: usize>(&mut self, keys: [&Q; N]) -> [Option<&mut V>; N]
+    where
+        K: Borrow<Q>,
+        Q: Hash + Eq + ?Sized,
+    {
+        self._inner.get_disjoint_mut(keys)
+    }
+
     /// Returns a reference to the value of the key passed in.
     /// Because this hashmap mimicks the python defaultdict, it will also return a reference to a
     /// value if the key is not present.
@@ -208,7 +234,7 @@ where
     /// assert_eq!((&10, &20), key_value);
     /// ```
     #[must_use]
-    pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&K, &V)
+    pub fn get_key_value<'a>(&'a self, key: &'a K) -> (&'a K, &'a V)
     where
         K: Eq + Hash,
     {
