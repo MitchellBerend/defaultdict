@@ -798,7 +798,7 @@ where
     fn from_iter<T: IntoIterator<Item = (K, V)>>(iter: T) -> Self {
         let mut map = DefaultBTreeMap::default();
         for (k, v) in iter {
-            let _ = map.insert(k, v);
+            map.insert(k, v);
         }
         map
     }
