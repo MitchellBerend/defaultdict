@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo publish --dry-run
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cargo publish --dry-run
       run: cargo publish --dry-run --verbose
       env:
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo publish
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cargo login
       run: cargo login $CARGO_AUTH_TOKEN
       env:
