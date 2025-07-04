@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo format
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cargo fmt
       run: cargo fmt
 
@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo clippy
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Run cargo clippy
       run: cargo clippy
 
@@ -29,7 +29,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo test
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
       run: cargo test --verbose
 
@@ -37,7 +37,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / cargo test doc
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build
       run: cargo test --doc --verbose
 
@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     name: ubuntu / stable / coverage
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
       - name: Install stable
@@ -63,6 +63,8 @@ jobs:
       - name: cargo llvm-cov
         run: cargo llvm-cov --locked --all-features --lcov --output-path lcov.info
       - name: Upload to codecov.io
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v5
         with:
           fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
+          env_vars: OS,RUST
