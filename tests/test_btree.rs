@@ -334,11 +334,8 @@ fn range_mut_btree() {
         index += 1
     }
 
-    index = 0;
-
     for (&_key, val) in map.range_mut(0..10) {
         *val += 100;
-        index += 1;
     }
 
     index = 0;
