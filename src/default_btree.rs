@@ -3,8 +3,8 @@
 use std::borrow::Borrow;
 use std::collections::{
     btree_map::{
-        Entry, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry, Range, RangeMut,
-        Values, ValuesMut,
+        Entry, ExtractIf, IntoIter, IntoKeys, IntoValues, Iter, IterMut, Keys, OccupiedEntry,
+        Range, RangeMut, Values, ValuesMut,
     },
     BTreeMap,
 };
@@ -133,6 +133,36 @@ where
     #[inline]
     pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         self._inner.entry(key)
+    }
+
+    /// Creates an iterator that visits elements (key-value pairs) in the specified range in
+    /// ascending key order and uses a closure to determine if an element should be removed. If the
+    /// closure returns true, the element is removed from the map and yielded. If the closure
+    /// returns false, or panics, the element remains in the map and will not be yielded. The
+    /// iterator also lets you mutate the value of each element in the closure, regardless of
+    /// whether you choose to keep or remove it.
+    ///
+    /// # Example
+    /// ```
+    /// use defaultdict::{DefaultBTreeMap, defaultbtreemap};
+    ///
+    /// let mut map: DefaultBTreeMap<i8, i8> = defaultbtreemap!(
+    ///     (1, 2),
+    ///     (3, 4),
+    ///     (6, 7),
+    /// );
+    /// let evens: DefaultBTreeMap<i8, i8> = map.extract_if(.., |k, _v| k % 2 == 0).collect();
+    ///
+    /// assert_eq!(&7, evens.get(&6));
+    /// ```
+    #[inline]
+    pub fn extract_if<F, R>(&mut self, range: R, pred: F) -> ExtractIf<'_, K, V, R, F>
+    where
+        K: Ord,
+        R: RangeBounds<K>,
+        F: FnMut(&K, &mut V) -> bool,
+    {
+        self._inner.extract_if(range, pred)
     }
 
     /// Returns the first entry in the map for in-place manipulation. The key of this entry is the
