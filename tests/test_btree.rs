@@ -3,6 +3,53 @@ use defaultdict::*;
 use std::collections::BTreeMap;
 
 #[test]
+fn simple_extract_if() {
+    let mut map: DefaultBTreeMap<i8, i8> = (0..10).map(|idx| (idx, idx)).collect();
+    let evens: DefaultBTreeMap<i8, i8> = map.extract_if(.., |k, _| k % 2 == 0).collect();
+
+    for (k, v) in map.into_iter() {
+        assert_eq!(0, k % 1);
+        assert_eq!(0, v % 1);
+    }
+
+    for (k, v) in evens.into_iter() {
+        assert_eq!(0, k % 2);
+        assert_eq!(0, v % 2);
+    }
+}
+
+#[test]
+fn test_extract_no_match() {
+    let mut map: DefaultBTreeMap<i8, i8> = (0..10).map(|idx| (idx, idx)).collect();
+
+    let extracted: DefaultBTreeMap<i8, i8> = map.extract_if(.., |k, _v| k > &12).collect();
+
+    assert!(extracted.is_empty());
+    assert_eq!(10, map.len());
+}
+
+#[test]
+fn test_extract_if_mutate() {
+    let mut map: DefaultBTreeMap<i8, i8> = (0..10).map(|idx| (idx, idx)).collect();
+
+    let mutated: DefaultBTreeMap<i8, i8> = map
+        .extract_if(.., |_, v| {
+            if v == &2 {
+                *v = 12;
+                return true;
+            }
+            false
+        })
+        .collect();
+
+    assert_eq!(9, map.len());
+    assert!(!map.contains_key(&2));
+
+    assert_eq!(1, mutated.len());
+    assert_eq!(&12, mutated.get(&2));
+}
+
+#[test]
 fn clear_btree() {
     let mut map = DefaultBTreeMap::<i8, i8>::new();
     map.insert(1, 123);
