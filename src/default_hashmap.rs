@@ -139,7 +139,7 @@ where
     /// assert_eq!(empty, collected);
     /// ```
     #[inline]
-    pub fn drain(&mut self) -> Drain<K, V> {
+    pub fn drain(&mut self) -> Drain<'_, K, V> {
         self._inner.drain()
     }
 
@@ -162,7 +162,7 @@ where
     /// assert_eq!(&30, map.get(&10));
     /// ```
     #[inline]
-    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         self._inner.entry(key)
     }
 
@@ -534,7 +534,7 @@ where
     /// assert_eq!(golden, collected);
     /// ```
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
         self._inner.values_mut()
     }
 

@@ -131,7 +131,7 @@ where
     /// assert_eq!(&12, map.get(&1));
     /// ```
     #[inline]
-    pub fn entry(&mut self, key: K) -> Entry<K, V> {
+    pub fn entry(&mut self, key: K) -> Entry<'_, K, V> {
         self._inner.entry(key)
     }
 
@@ -156,7 +156,7 @@ where
     /// assert_eq!(&12, map.get(&1));
     /// ```
     #[inline]
-    pub fn first_entry(&mut self) -> Option<OccupiedEntry<K, V>>
+    pub fn first_entry(&mut self) -> Option<OccupiedEntry<'_, K, V>>
     where
         K: Ord,
     {
@@ -383,7 +383,7 @@ where
     /// assert_eq!(&14, map.get(&3));
     /// ```
     #[inline]
-    pub fn last_entry(&mut self) -> Option<OccupiedEntry<K, V>>
+    pub fn last_entry(&mut self) -> Option<OccupiedEntry<'_, K, V>>
     where
         K: Ord,
     {
@@ -520,7 +520,7 @@ where
     /// assert_eq!(vec, golden);
     /// ```
     #[inline]
-    pub fn range<T, R>(&self, range: R) -> Range<K, V>
+    pub fn range<T, R>(&self, range: R) -> Range<'_, K, V>
     where
         T: Ord + ?Sized,
         K: Borrow<T> + Ord,
@@ -556,7 +556,7 @@ where
     /// }
     /// ```
     #[inline]
-    pub fn range_mut<T, R>(&mut self, range: R) -> RangeMut<K, V>
+    pub fn range_mut<T, R>(&mut self, range: R) -> RangeMut<'_, K, V>
     where
         T: Ord + ?Sized,
         K: Borrow<T> + Ord,
@@ -701,7 +701,7 @@ where
     /// }
     /// ```
     #[inline]
-    pub fn values_mut(&mut self) -> ValuesMut<K, V> {
+    pub fn values_mut(&mut self) -> ValuesMut<'_, K, V> {
         self._inner.values_mut()
     }
 }
